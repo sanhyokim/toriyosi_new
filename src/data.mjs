@@ -198,6 +198,8 @@ export const menu = [
     options: flavors.map((f) => f.name),
     price: null,
     glaze: 'tare',
+    // たれ味の写真を共用
+    photo: 'momo-tare.jpg',
   },
   {
     id: 'mune',
@@ -239,6 +241,8 @@ export const menu = [
     options: ['砂ずり', '素揚げ砂ずり', 'ぼんじり', 'はつ', '手羽先'],
     price: null,
     glaze: 'kushi',
+    // 旧サイト /menu/ の3枚組バナー（ebd145da…jpg）から串の部分を切り出したもの
+    photo: 'kushi.jpg',
   },
   {
     id: 'bento',
@@ -249,6 +253,8 @@ export const menu = [
     options: ['小盛', '大盛', '特盛'],
     price: null,
     glaze: 'tare',
+    photo: 'bento.jpg',
+    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/c10237a4fb3077a1bf4c485e5e67462c.jpg',
   },
   {
     id: 'moriawase-3',
@@ -271,6 +277,8 @@ export const menu = [
     price: null,
     reservation: true,
     glaze: 'tare',
+    photo: 'moriawase-5.jpg',
+    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/top-e1603346842728.jpg',
   },
 ];
 
