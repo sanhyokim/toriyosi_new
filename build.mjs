@@ -42,7 +42,7 @@ const restaurantLD = (s) => ({
   alternateName: `とりよし ${s.short}`,
   url: abs(`shop/${s.slug}/`),
   telephone: telIntl(s.tel),
-  image: photoExists(s.photo) ? abs(`assets/photos/${s.photo}`) : abs(site.ogImage),
+  image: photoExists(s.photo) ? abs(`assets/photos/${s.photo}`) : !PREVIEW && s.legacyPhoto ? s.legacyPhoto : abs(site.ogImage),
   servesCuisine: ['唐揚げ', '鶏料理', 'Japanese fried chicken (karaage)'],
   address: { '@type': 'PostalAddress', postalCode: s.postalCode, addressRegion: s.region, addressLocality: s.locality, streetAddress: s.street, addressCountry: 'JP' },
   geo: { '@type': 'GeoCoordinates', latitude: s.geo.lat, longitude: s.geo.lng },
@@ -90,15 +90,20 @@ const webpageLD = (path, name, type = 'WebPage', extra = {}) => ({
 const graph = (...nodes) => ({ '@context': 'https://schema.org', '@graph': [orgLD(), websiteLD(), ...nodes] });
 
 /* ---------- 部品 ---------- */
-const visual = (L, { photo, glaze, layout = 'trio', seed = 1, alt }) => {
-  const img = photoExists(photo)
-    ? `<img src="${L(`assets/photos/${photo}`)}" alt="${esc(alt)}" loading="lazy" decoding="async" width="800" height="600" data-fallback>`
+// 本番では、今のサーバーに残る WordPress の写真（/wp-content/uploads/…）を同じURLで使う。
+// 写真が見つからなければ main.js が img を外し、下の手続き生成イラストが見える。
+const LEGACY_PHOTOS = !PREVIEW && !process.argv.includes('--no-legacy-photos');
+const photoSrc = (L, photo, legacy) => photoExists(photo) ? L(`assets/photos/${photo}`) : LEGACY_PHOTOS && legacy ? new URL(legacy).pathname : '';
+const visual = (L, { photo, legacy, glaze, layout = 'trio', seed = 1, alt }) => {
+  const src = photoSrc(L, photo, legacy);
+  const img = src
+    ? `<img src="${src}" alt="${esc(alt)}" loading="lazy" decoding="async" width="800" height="600" data-fallback>`
     : '';
   return `<canvas data-glaze="${glaze}" data-layout="${layout}" data-seed="${seed}" role="img" aria-label="${esc(alt)}のイメージ"></canvas>${img}`;
 };
 
 const menuCard = (L, m, i) => `<article class="item rv" id="${m.id}">
-  <div class="item__vis">${m.reservation ? '<span class="badge">要予約</span>' : ''}${visual(L, { photo: m.photo, glaze: m.glaze, seed: i + 3, alt: m.name })}</div>
+  <div class="item__vis">${m.reservation ? '<span class="badge">要予約</span>' : ''}${visual(L, { photo: m.photo, legacy: m.legacyPhoto, glaze: m.glaze, seed: i + 3, alt: m.name })}</div>
   <div class="item__body">
     <h3>${esc(m.name)}</h3>
     ${m.spec ? `<p class="item__spec">${esc(m.spec)}</p>` : ''}
@@ -316,7 +321,7 @@ for (const s of shops) {
 <main id="main">
 ${pageHero({ L, title: `鶏好 ${esc(s.name)}`, lead: esc(addressOf(s)), crumbs: [['shop/', '店舗一覧'], [`shop/${s.slug}/`, s.name]] })}
 <section class="sec"><div class="wrap shopdetail">
-  <div class="shopdetail__vis">${visual(L, { photo: s.photo, glaze: 'tare', layout: 'trio', seed: s.slug.length, alt: `鶏好 ${s.name}` })}</div>
+  <div class="shopdetail__vis">${visual(L, { photo: s.photo, legacy: s.legacyPhoto, glaze: 'tare', layout: 'trio', seed: s.slug.length, alt: `鶏好 ${s.name}` })}</div>
   <div class="stack" style="gap:28px">
     <dl class="spec">
       <dt>住所</dt><dd>${esc(addressOf(s))}<br><a href="${mapUrl(s)}" target="_blank" rel="noopener">地図アプリで開く</a></dd>
@@ -516,6 +521,7 @@ ${pageHero({ L, title: 'このページは揚がっていません。', lead: '�
 await rm(OUT, { recursive: true, force: true });
 await mkdir(OUT, { recursive: true });
 await cp('src/assets', join(OUT, 'assets'), { recursive: true });
+if (!PREVIEW) await cp('src/static', OUT, { recursive: true }); // .htaccess など、サーバーにそのまま置くファイル
 // CSS を軽く圧縮。main.css は各ページの <style> にインライン化（描画をブロックしない）、
 // フォント定義は非同期で読み込む。
 const minify = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s*\n\s*/g, '').replace(/\s*([{};,>])\s*/g, '$1').replace(/:\s+/g, ':').replace(/;}/g, '}');

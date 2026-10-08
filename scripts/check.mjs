@@ -35,6 +35,7 @@ for (const f of files) {
   for (const m of h.matchAll(/\s(?:href|src)="([^"]+)"/g)) {
     const u = m[1];
     if (/^(https?:|mailto:|tel:|data:)/.test(u)) continue;
+    if (u.startsWith('/wp-content/uploads/')) continue; // 今のサーバーに残す旧サイトの写真
     const [path, hash] = u.split('#');
     if (!path) { if (hash && !ids.has(hash)) err(f, `ページ内リンク切れ #${hash}`); continue; }
     let target = resolve(dirname(f), decodeURIComponent(path));

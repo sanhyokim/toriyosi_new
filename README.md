@@ -12,7 +12,7 @@ npm run fonts      # 文言を変えたあとに実行（フォントのサブ�
 npm run images     # OGP画像・アイコンを再生成（Playwright が必要）
 ```
 
-`dist/` をそのまま任意の静的ホスティング（Cloudflare Pages / Netlify / Vercel / GitHub Pages など）に置けば公開できます。
+`dist/` をそのまま今のサーバー（Apache）に置けば公開できます。手順は [DEPLOY.md](DEPLOY.md) を参照してください。`.htaccess`（HTTPS統一・圧縮・キャッシュ・旧URLのリダイレクト）も `dist/` に含まれます。
 
 ## 構成
 
