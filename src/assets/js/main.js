@@ -57,11 +57,11 @@ export function initPage() {
   /* ヒーロー: からあげの山 + 湯気 + タップで「ジュワッ」 */
   const pile = $('.hero__pile');
   if (pile) {
-    const base = $('canvas.base', pile), fx = $('canvas.fx', pile);
+    const base = $('img.base', pile), fx = $('canvas.fx', pile);
     idle(async () => {
-      const src = await renderPile(base, { glaze: 'tare', layout: 'hero', seed: 3 });
+      await base.decode().catch(() => {});
       pile.classList.add('is-ready');
-      const sz = new Sizzle(fx, { source: src, density: 1.1, steamFrom: [0.25, 0.75, 0.48], offsetY: fx.clientHeight - base.clientHeight });
+      const sz = new Sizzle(fx, { source: { glints: [] }, density: 1.1, steamFrom: [0.25, 0.75, 0.48], offsetY: fx.clientHeight - base.clientHeight });
       if (signal.aborted) return;
       sz.start();
       signal.addEventListener('abort', () => sz.stop());
@@ -92,7 +92,7 @@ export function initPage() {
       let t;
       addEventListener('resize', () => {
         clearTimeout(t);
-        t = setTimeout(async () => { const s = await renderPile(base, { glaze: 'tare', layout: 'hero', seed: 3 }); sz.source = s; sz.resize(); sz.offsetY = fx.clientHeight - base.clientHeight; }, 200);
+        t = setTimeout(() => { sz.resize(); sz.offsetY = fx.clientHeight - base.clientHeight; }, 200);
       }, { signal });
     });
   }
@@ -100,7 +100,7 @@ export function initPage() {
   /* フレーバーラボ */
   const lab = $('#flavors');
   if (lab) {
-    const cv = $('.lab__stage canvas', lab);
+    const photo = $('.lab__photo', lab);
     const big = $('.lab__big', lab);
     const count = $('.lab__count', lab);
     const tabs = $$('[role="tab"]', lab);
@@ -116,9 +116,12 @@ export function initPage() {
       const tab = tabs[i];
       big.textContent = tab.dataset.name;
       count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(tabs.length).padStart(2, '0')}`;
-      cv.classList.add('swap');
-      const job = renderPile(cv, { glaze: tab.dataset.glaze, layout: 'trio', seed: i + 2 });
-      setTimeout(() => job.then(() => cv.classList.remove('swap')), reduce ? 0 : 220);
+      photo.classList.add('swap');
+      setTimeout(() => {
+        photo.src = tab.dataset.photo;
+        photo.alt = `${tab.dataset.name}のからあげ`;
+        photo.decode().catch(() => {}).then(() => photo.classList.remove('swap'));
+      }, reduce ? 0 : 220);
     };
     tabs.forEach((t, i) => {
       t.addEventListener('click', () => select(i));

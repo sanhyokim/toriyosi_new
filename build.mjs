@@ -94,6 +94,8 @@ const graph = (...nodes) => ({ '@context': 'https://schema.org', '@graph': [orgL
 // 写真が見つからなければ main.js が img を外し、下の手続き生成イラストが見える。
 const LEGACY_PHOTOS = !PREVIEW && !process.argv.includes('--no-legacy-photos');
 const photoSrc = (L, photo, legacy) => photoExists(photo) ? L(`assets/photos/${photo}`) : LEGACY_PHOTOS && legacy ? new URL(legacy).pathname : '';
+// 写真のない味（たれコショー・たれ一味）は、ベースが同じたれの写真を使う
+const flavorPhoto = (f) => (photoExists(f.photo) ? f.photo : flavors[0].photo);
 const visual = (L, { photo, legacy, glaze, layout = 'trio', seed = 1, alt }) => {
   const src = photoSrc(L, photo, legacy);
   const img = src
@@ -180,7 +182,7 @@ page('/', (L) => {
         <h1 class="hero__name" id="hero-title"><span class="sub">福岡のからあげテイクアウト専門店</span>鶏好<span class="ruby">TORIYOSHI</span></h1>
         <div class="hero__pile" tabindex="0" role="img" aria-label="揚げたての鶏好のからあげ。タップすると揚げ音が弾けます">
           <span class="loading" aria-hidden="true">揚げたて準備中…</span>
-          <canvas class="base"></canvas><canvas class="fx"></canvas>
+          <img class="base" src="${L('assets/photos/hero-karaage.webp')}" alt="" width="1280" height="1396" decoding="async" fetchpriority="high"><canvas class="fx"></canvas>
         </div>
       </div>
       <p class="hero__tate" aria-label="食卓に幸福を、食卓に笑顔を、食卓に愛を">食卓に<span class="flip" data-words='${JSON.stringify(site.taglineWords)}'><span>${site.taglineWords[0]}</span></span>を</p>
@@ -211,9 +213,9 @@ page('/', (L) => {
     <div class="wrap">
       <div class="sec__head rv"><p class="eyebrow">Flavor Lab</p><h2 class="h2" id="f-title">もも、7つの味。</h2><p class="lead">看板の骨なしもも肉は、7種類の味から選べます。気になる味を押してみてください。</p></div>
       <div class="lab__grid">
-        <div class="lab__stage rv"><span class="lab__count mono">01 / 07</span><canvas role="img" aria-label="選んだ味のからあげのイメージ"></canvas><span class="lab__big" aria-hidden="true">${flavors[0].name}</span></div>
+        <div class="lab__stage rv"><span class="lab__count mono">01 / 07</span><img class="lab__photo" src="${L(`assets/photos/${flavorPhoto(flavors[0])}`)}" alt="${esc(flavors[0].name)}のからあげ" width="850" height="680" decoding="async"><span class="lab__big" aria-hidden="true">${flavors[0].name}</span></div>
         <div>
-          <ul class="flist" role="tablist" aria-label="もも肉の味" aria-orientation="vertical">${flavors.map((f, i) => `<li role="presentation"><button role="tab" type="button" id="tab-${f.id}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-glaze="${f.glaze}" data-name="${esc(f.name)}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="nm">${esc(f.name)}</span>${f.badge ? `<span class="bd">${f.badge}</span>` : '<span></span>'}<span class="cp">${esc(f.copy)}</span></button></li>`).join('')}</ul>
+          <ul class="flist" role="tablist" aria-label="もも肉の味" aria-orientation="vertical">${flavors.map((f, i) => `<li role="presentation"><button role="tab" type="button" id="tab-${f.id}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-photo="${L(`assets/photos/${flavorPhoto(f)}`)}" data-name="${esc(f.name)}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="nm">${esc(f.name)}</span>${f.badge ? `<span class="bd">${f.badge}</span>` : '<span></span>'}<span class="cp">${esc(f.copy)}</span></button></li>`).join('')}</ul>
           <p class="lab__note">骨なしもも肉 6〜7個（250g以上）。オリジナルの塩は別売りです。</p>
         </div>
       </div>
@@ -275,7 +277,7 @@ ${pageHero({ L, title: 'メニュー', lead: '特製の漬けダレで長時間�
 <section class="sec"><div class="wrap stack">
   <div>
     <div class="sec__head"><p class="eyebrow">骨なしもも肉の味</p><h2 class="h2">7種類から選べます</h2></div>
-    <ul class="ftiles">${flavors.map((f, i) => `<li class="ftile"><canvas data-glaze="${f.glaze}" data-layout="trio" data-seed="${i + 2}" role="img" aria-label="${esc(f.name)}のからあげのイメージ"></canvas><div><h3>${esc(f.name)}${f.badge ? `<small>${f.badge}</small>` : ''}</h3><p>${esc(f.copy)}</p></div></li>`).join('')}</ul>
+    <ul class="ftiles">${flavors.map((f, i) => `<li class="ftile"><img src="${L(`assets/photos/${flavorPhoto(f)}`)}" alt="${esc(f.name)}のからあげ" width="850" height="680" loading="lazy" decoding="async"><div><h3>${esc(f.name)}${f.badge ? `<small>${f.badge}</small>` : ''}</h3><p>${esc(f.copy)}</p></div></li>`).join('')}</ul>
   </div>
   <div class="menu-grid">${menu.map((m, i) => menuCard(L, m, i)).join('')}</div>
   <ul class="notes">${menuNotes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
