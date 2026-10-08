@@ -94,6 +94,8 @@ const graph = (...nodes) => ({ '@context': 'https://schema.org', '@graph': [orgL
 // 写真が見つからなければ main.js が img を外し、下の手続き生成イラストが見える。
 const LEGACY_PHOTOS = !PREVIEW && !process.argv.includes('--no-legacy-photos');
 const photoSrc = (L, photo, legacy) => photoExists(photo) ? L(`assets/photos/${photo}`) : LEGACY_PHOTOS && legacy ? new URL(legacy).pathname : '';
+// 味の組み立て「もも × たれ × コショー」
+const formula = (f) => ['もも', ...f.parts].map((p, i) => `${i ? '<i aria-hidden="true">×</i>' : ''}<b>${esc(p)}</b>`).join('');
 const visual = (L, { photo, legacy, glaze, layout = 'trio', seed = 1, alt }) => {
   const src = photoSrc(L, photo, legacy);
   const img = src
@@ -127,33 +129,13 @@ const ticket = (L, s, { heading = 'h3' } = {}) => `<article class="ticket rv" da
   </div>
 </article>`;
 
-// 店舗位置を緯度経度から正しい縮尺で描く地図
+// 店舗の地図は Google マップの埋め込み。住所で検索して表示し、タブで店舗を切り替える
+const embedUrl = (s) => `https://www.google.com/maps?q=${encodeURIComponent(`${s.region}${s.locality}${s.street}`)}&hl=ja&z=16&output=embed`;
 function shopMap() {
-  const W = 400, H = 600;
-  const lat0 = 33.575, lat1 = 33.79, lng0 = 130.36;
-  const ky = H / (lat1 - lat0);
-  const kx = ky * Math.cos((33.68 * Math.PI) / 180);
-  const P = (lat, lng) => [(lng - lng0) * kx, (lat1 - lat) * ky];
-  const kmPx = ky / 110.9;
-  const grid = [];
-  for (let la = 33.6; la < lat1; la += 0.05) { const y = P(la, 0)[1]; grid.push(`<line x1="0" x2="${W}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/><text x="4" y="${(y - 4).toFixed(1)}">${la.toFixed(2)}°N</text>`); }
-  for (let ln = 130.4; ln < 130.53; ln += 0.05) { const x = P(0, ln)[0]; grid.push(`<line y1="0" y2="${H}" x1="${x.toFixed(1)}" x2="${x.toFixed(1)}"/><text x="${(x + 4).toFixed(1)}" y="${H - 6}">${ln.toFixed(2)}°E</text>`); }
-  const pins = shops.map((s) => {
-    const [x, y] = P(s.geo.lat, s.geo.lng);
-    const right = x < W * 0.62;
-    return `<g class="pin" id="pin-${s.slug}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8"/><text x="${(x + (right ? 14 : -14)).toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="${right ? 'start' : 'end'}">${s.name}</text></g>`;
-  }).join('');
-  const [hx, hy] = P(33.5897, 130.4207);
-  const bar = kmPx * 2;
   return `<figure class="map rv" aria-labelledby="map-cap">
-  <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="鶏好4店舗の位置関係（福岡市東区・福津市）">
-    <g class="grid">${grid.join('')}</g>
-    <g class="ref"><circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="4"/><text x="${(hx + 10).toFixed(1)}" y="${(hy + 4).toFixed(1)}">博多駅</text></g>
-    ${pins}
-    <g transform="translate(${W - 24 - bar} ${H - 34})" class="ref"><rect width="${bar.toFixed(1)}" height="4" fill="currentColor" style="fill:var(--kraft-ink)"/><text y="-6">2 km</text></g>
-    <g transform="translate(${W - 30} 30)" class="ref"><path d="M0 -16 L7 6 L0 1 L-7 6 Z" style="fill:var(--kraft-ink)"/><text x="-4" y="22">N</text></g>
-  </svg>
-  <figcaption id="map-cap">緯度・経度から縮尺どおりに配置しています。</figcaption>
+  <div class="map__tabs" role="tablist" aria-label="地図に表示する店舗">${shops.map((s, i) => `<button type="button" role="tab" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-map="${esc(embedUrl(s))}">${esc(s.name)}</button>`).join('')}</div>
+  <iframe class="map__frame" src="${esc(embedUrl(shops[0]))}" title="${esc(shops[0].name)}の地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+  <figcaption id="map-cap">店舗名を押すと地図が切り替わります（Google マップ）。</figcaption>
 </figure>`;
 }
 
@@ -180,7 +162,7 @@ page('/', (L) => {
         <h1 class="hero__name" id="hero-title"><span class="sub">福岡のからあげテイクアウト専門店</span>鶏好<span class="ruby">TORIYOSHI</span></h1>
         <div class="hero__pile" tabindex="0" role="img" aria-label="揚げたての鶏好のからあげ。タップすると揚げ音が弾けます">
           <span class="loading" aria-hidden="true">揚げたて準備中…</span>
-          <canvas class="base"></canvas><canvas class="fx"></canvas>
+          <img class="base" src="${L('assets/photos/hero-karaage.webp')}" alt="" width="1280" height="1396" decoding="async" fetchpriority="high"><canvas class="fx"></canvas>
         </div>
       </div>
       <p class="hero__tate" aria-label="食卓に幸福を、食卓に笑顔を、食卓に愛を">食卓に<span class="flip" data-words='${JSON.stringify(site.taglineWords)}'><span>${site.taglineWords[0]}</span></span>を</p>
@@ -211,9 +193,9 @@ page('/', (L) => {
     <div class="wrap">
       <div class="sec__head rv"><p class="eyebrow">Flavor Lab</p><h2 class="h2" id="f-title">もも、7つの味。</h2><p class="lead">看板の骨なしもも肉は、7種類の味から選べます。気になる味を押してみてください。</p></div>
       <div class="lab__grid">
-        <div class="lab__stage rv"><span class="lab__count mono">01 / 07</span><canvas role="img" aria-label="選んだ味のからあげのイメージ"></canvas><span class="lab__big" aria-hidden="true">${flavors[0].name}</span></div>
+        <div class="lab__stage rv" style="--tone:${flavors[0].tone};--len:${[...flavors[0].name].length}" data-spice="${flavors[0].spice}"><span class="lab__count mono">01 / 07</span><canvas class="lab__fx" aria-hidden="true"></canvas><div class="lab__plate" aria-live="polite"><p class="lab__formula">${formula(flavors[0])}</p><p class="lab__big">${esc(flavors[0].name)}</p><p class="lab__kana mono">${esc(flavors[0].kana)}</p></div></div>
         <div>
-          <ul class="flist" role="tablist" aria-label="もも肉の味" aria-orientation="vertical">${flavors.map((f, i) => `<li role="presentation"><button role="tab" type="button" id="tab-${f.id}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-glaze="${f.glaze}" data-name="${esc(f.name)}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="nm">${esc(f.name)}</span>${f.badge ? `<span class="bd">${f.badge}</span>` : '<span></span>'}<span class="cp">${esc(f.copy)}</span></button></li>`).join('')}</ul>
+          <ul class="flist" role="tablist" aria-label="もも肉の味" aria-orientation="vertical">${flavors.map((f, i) => `<li role="presentation"><button role="tab" type="button" id="tab-${f.id}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-name="${esc(f.name)}" data-kana="${esc(f.kana)}" data-tone="${f.tone}" data-spice="${f.spice}" data-formula="${esc(formula(f))}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="nm">${esc(f.name)}</span>${f.badge ? `<span class="bd">${f.badge}</span>` : '<span></span>'}<span class="cp">${esc(f.copy)}</span></button></li>`).join('')}</ul>
           <p class="lab__note">骨なしもも肉 6〜7個（250g以上）。オリジナルの塩は別売りです。</p>
         </div>
       </div>
@@ -275,7 +257,7 @@ ${pageHero({ L, title: 'メニュー', lead: '特製の漬けダレで長時間�
 <section class="sec"><div class="wrap stack">
   <div>
     <div class="sec__head"><p class="eyebrow">骨なしもも肉の味</p><h2 class="h2">7種類から選べます</h2></div>
-    <ul class="ftiles">${flavors.map((f, i) => `<li class="ftile"><canvas data-glaze="${f.glaze}" data-layout="trio" data-seed="${i + 2}" role="img" aria-label="${esc(f.name)}のからあげのイメージ"></canvas><div><h3>${esc(f.name)}${f.badge ? `<small>${f.badge}</small>` : ''}</h3><p>${esc(f.copy)}</p></div></li>`).join('')}</ul>
+    <ul class="ftiles">${flavors.map((f, i) => `<li class="ftile" style="--tone:${f.tone}"><p class="ftile__vis" data-spice="${f.spice}" aria-hidden="true"><span class="no mono">${String(i + 1).padStart(2, '0')}</span></p><div><p class="ftile__formula">${formula(f)}</p><h3>${esc(f.name)}${f.badge ? `<small>${f.badge}</small>` : ''}</h3><p>${esc(f.copy)}</p></div></li>`).join('')}</ul>
   </div>
   <div class="menu-grid">${menu.map((m, i) => menuCard(L, m, i)).join('')}</div>
   <ul class="notes">${menuNotes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>

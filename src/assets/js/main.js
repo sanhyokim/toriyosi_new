@@ -30,6 +30,82 @@ if (burger && drawer) {
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && !drawer.hidden) { set(false); burger.focus(); } });
 }
 
+/* 味ごとの薬味。上から降って、皿（中央）のあたりで消える */
+const SPICES = {
+  tare: { n: 26, kinds: [['drop', '#E8A04A'], ['drop', '#B65E10']], size: [3, 6], speed: [0.35, 0.7] },
+  pepper: { n: 110, kinds: [['dot', '#0E0603'], ['dot', '#3A2414'], ['drop', '#C98A3E']], size: [1, 2.2], speed: [0.5, 1] },
+  ichimi: { n: 70, kinds: [['flake', '#F0461E'], ['flake', '#C8250E'], ['flake', '#FF7A2E']], size: [2.5, 5], speed: [0.5, 1] },
+  garlic: { n: 40, kinds: [['chip', '#F6E6C0'], ['chip', '#E9CF95'], ['drop', '#E0A040']], size: [3, 6], speed: [0.35, 0.75] },
+  kankara: { n: 90, kinds: [['flake', '#D8321A'], ['flake', '#8E1206'], ['chip', '#F6E6C0']], size: [2.5, 5.5], speed: [0.5, 1] },
+  shio: { n: 70, kinds: [['crystal', '#FFF8EA'], ['crystal', '#FFFFFF']], size: [1.5, 3.2], speed: [0.4, 0.9] },
+  ponzu: { n: 30, kinds: [['ring', '#F7C948'], ['drop', '#F2B632'], ['drop', '#FFE08A']], size: [3, 7], speed: [0.3, 0.6] },
+};
+class Seasoning {
+  constructor(canvas, signal) {
+    this.c = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.ps = [];
+    this.spec = SPICES.tare;
+    this.raf = 0;
+    this.resize();
+    addEventListener('resize', () => this.resize(), { signal });
+  }
+  resize() {
+    const r = Math.min(devicePixelRatio || 1, 2);
+    this.w = this.c.clientWidth; this.h = this.c.clientHeight;
+    this.c.width = this.w * r; this.c.height = this.h * r;
+    this.ctx.setTransform(r, 0, 0, r, 0, 0);
+    if (reduce) this.draw();
+  }
+  spawn(y) {
+    const s = this.spec, rnd = (a, b) => a + Math.random() * (b - a);
+    const [kind, color] = s.kinds[(Math.random() * s.kinds.length) | 0];
+    return { kind, color, x: rnd(0.12, 0.88) * this.w, y: y ?? rnd(-0.2, 0) * this.h, size: rnd(...s.size), v: rnd(...s.speed), rot: rnd(0, 6.28), vr: rnd(-0.04, 0.04), sway: rnd(0, 6.28) };
+  }
+  set(name) {
+    this.spec = SPICES[name] || SPICES.tare;
+    // 切り替え時はいったん上からまとめて降らせる
+    this.ps = Array.from({ length: this.spec.n }, () => this.spawn(reduce ? Math.random() * this.h : -Math.random() * this.h * 0.9));
+    if (reduce) this.draw();
+  }
+  start() { if (!this.raf && !reduce) { const loop = () => { this.step(); this.draw(); this.raf = requestAnimationFrame(loop); }; this.raf = requestAnimationFrame(loop); } }
+  stop() { cancelAnimationFrame(this.raf); this.raf = 0; }
+  step() {
+    for (let i = 0; i < this.ps.length; i++) {
+      const p = this.ps[i];
+      p.y += p.v * (this.h / 400);
+      p.sway += 0.02;
+      p.x += Math.sin(p.sway) * 0.25;
+      p.rot += p.vr;
+      if (p.y > this.h * 0.95) this.ps[i] = this.spawn();
+    }
+  }
+  draw() {
+    const { ctx, w, h } = this;
+    ctx.clearRect(0, 0, w, h);
+    for (const p of this.ps) {
+      // 上下の端ではうっすら消す
+      const t = p.y / h;
+      ctx.globalAlpha = Math.max(0, Math.min(1, t * 6, (0.95 - t) * 5));
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = ctx.strokeStyle = p.color;
+      const s = p.size;
+      ctx.beginPath();
+      if (p.kind === 'dot') ctx.arc(0, 0, s, 0, 6.28);
+      else if (p.kind === 'drop') { ctx.rotate(-p.rot); ctx.moveTo(0, -s * 1.6); ctx.quadraticCurveTo(s, 0, 0, s); ctx.quadraticCurveTo(-s, 0, 0, -s * 1.6); }
+      else if (p.kind === 'flake') { ctx.moveTo(-s, -s * 0.4); ctx.lineTo(s * 0.6, -s * 0.8); ctx.lineTo(s, s * 0.3); ctx.lineTo(-s * 0.3, s * 0.7); }
+      else if (p.kind === 'chip') ctx.ellipse(0, 0, s, s * 0.7, 0, 0, 6.28);
+      else if (p.kind === 'crystal') ctx.rect(-s / 2, -s / 2, s, s);
+      else if (p.kind === 'ring') { ctx.lineWidth = 1.4; ctx.arc(0, 0, s, 0, 6.28); ctx.stroke(); ctx.restore(); continue; }
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+
 // ページ単位の初期化。プレビューのページ切り替え時にも呼び直せるよう、
 // 前回分のリスナー・タイマーは AbortController でまとめて片付ける。
 let pageCtl = null;
@@ -57,11 +133,11 @@ export function initPage() {
   /* ヒーロー: からあげの山 + 湯気 + タップで「ジュワッ」 */
   const pile = $('.hero__pile');
   if (pile) {
-    const base = $('canvas.base', pile), fx = $('canvas.fx', pile);
+    const base = $('img.base', pile), fx = $('canvas.fx', pile);
     idle(async () => {
-      const src = await renderPile(base, { glaze: 'tare', layout: 'hero', seed: 3 });
+      await base.decode().catch(() => {});
       pile.classList.add('is-ready');
-      const sz = new Sizzle(fx, { source: src, density: 1.1, steamFrom: [0.25, 0.75, 0.48], offsetY: fx.clientHeight - base.clientHeight });
+      const sz = new Sizzle(fx, { source: { glints: [] }, density: 1.1, steamFrom: [0.25, 0.75, 0.48], offsetY: fx.clientHeight - base.clientHeight });
       if (signal.aborted) return;
       sz.start();
       signal.addEventListener('abort', () => sz.stop());
@@ -92,18 +168,24 @@ export function initPage() {
       let t;
       addEventListener('resize', () => {
         clearTimeout(t);
-        t = setTimeout(async () => { const s = await renderPile(base, { glaze: 'tare', layout: 'hero', seed: 3 }); sz.source = s; sz.resize(); sz.offsetY = fx.clientHeight - base.clientHeight; }, 200);
+        t = setTimeout(() => { sz.resize(); sz.offsetY = fx.clientHeight - base.clientHeight; }, 200);
       }, { signal });
     });
   }
 
-  /* フレーバーラボ */
+  /* フレーバーラボ: 写真は使わず、味の名前と降ってくる薬味で見せる */
   const lab = $('#flavors');
   if (lab) {
-    const cv = $('.lab__stage canvas', lab);
+    const stage = $('.lab__stage', lab);
+    const plate = $('.lab__plate', lab);
     const big = $('.lab__big', lab);
+    const kana = $('.lab__kana', lab);
+    const formula = $('.lab__formula', lab);
     const count = $('.lab__count', lab);
     const tabs = $$('[role="tab"]', lab);
+    const rain = new Seasoning($('.lab__fx', lab), signal);
+    signal.addEventListener('abort', () => rain.stop());
+    new IntersectionObserver(([e]) => (e.isIntersecting ? rain.start() : rain.stop())).observe(stage);
     let current = -1;
     const select = (i, focus) => {
       if (i === current) return;
@@ -113,12 +195,18 @@ export function initPage() {
         t.tabIndex = i === j ? 0 : -1;
       });
       if (focus) tabs[i].focus();
-      const tab = tabs[i];
-      big.textContent = tab.dataset.name;
+      const d = tabs[i].dataset;
       count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(tabs.length).padStart(2, '0')}`;
-      cv.classList.add('swap');
-      const job = renderPile(cv, { glaze: tab.dataset.glaze, layout: 'trio', seed: i + 2 });
-      setTimeout(() => job.then(() => cv.classList.remove('swap')), reduce ? 0 : 220);
+      stage.style.setProperty('--tone', d.tone);
+      stage.style.setProperty('--len', [...d.name].length);
+      plate.classList.add('swap');
+      big.replaceChildren(...[...d.name].map((c, k) => Object.assign(document.createElement('span'), { textContent: c, style: `--i:${k}` })));
+      setTimeout(() => {
+        formula.innerHTML = d.formula;
+        kana.textContent = d.kana;
+        plate.classList.remove('swap');
+      }, reduce ? 0 : 160);
+      rain.set(d.spice);
     };
     tabs.forEach((t, i) => {
       t.addEventListener('click', () => select(i));
@@ -129,8 +217,7 @@ export function initPage() {
         if (e.key === 'End') { e.preventDefault(); select(tabs.length - 1, true); }
       });
     });
-    const io = new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); idle(() => select(0)); } }, { rootMargin: '300px' });
-    io.observe(lab);
+    select(0);
   }
 
   /* メニュー・店舗の手続き生成ビジュアル（写真がない枠だけ） */
@@ -154,18 +241,24 @@ export function initPage() {
     img.addEventListener('error', fail);
   });
 
-  /* 地図のピンと店舗カードを連動 */
-  $$('[data-shop]').forEach((el) => {
-    const slug = el.dataset.shop;
-    const pin = document.getElementById(`pin-${slug}`);
-    if (!pin) return;
-    const on = () => pin.classList.add('is-on');
-    const off = () => pin.classList.remove('is-on');
-    el.addEventListener('pointerenter', on);
-    el.addEventListener('pointerleave', off);
-    el.addEventListener('focusin', on);
-    el.addEventListener('focusout', off);
-  });
+  /* 店舗の地図（Google マップ埋め込み）の切り替え */
+  const mapTabs = $$('.map__tabs [role="tab"]');
+  const frame = $('.map__frame');
+  if (frame) {
+    const show = (i, focus) => {
+      mapTabs.forEach((t, j) => { t.setAttribute('aria-selected', String(i === j)); t.tabIndex = i === j ? 0 : -1; });
+      if (focus) mapTabs[i].focus();
+      frame.src = mapTabs[i].dataset.map;
+      frame.title = `${mapTabs[i].textContent}の地図`;
+    };
+    mapTabs.forEach((t, i) => {
+      t.addEventListener('click', () => show(i));
+      t.addEventListener('keydown', (e) => {
+        const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+        if (d) { e.preventDefault(); show((i + d + mapTabs.length) % mapTabs.length, true); }
+      });
+    });
+  }
 
   /* 電話番号コピー */
   $$('[data-copy]').forEach((b) => {

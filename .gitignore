@@ -1,4 +1,4 @@
 dist/
-preview/
+/preview/
 node_modules/
 .DS_Store

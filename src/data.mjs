@@ -123,7 +123,7 @@ export const telIntl = (tel) => `+81-${tel.replace(/^0/, '')}`;
 export const mapUrl = (s) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`からあげ鶏好 ${s.name} ${s.region}${s.locality}${s.street}`)}`;
 
-// 骨なしもも肉の7つの味。glaze は karaage.js の描画パラメータ。
+// 骨なしもも肉の7つの味（写真なし）。parts は味の組み立て、tone はラボの色、spice は降らせる薬味（main.js）。
 export const flavors = [
   {
     id: 'tare',
@@ -132,8 +132,9 @@ export const flavors = [
     badge: '一番人気',
     copy: '特製の漬けダレがじっくり染みた、鶏好の看板の味。まずはここから。',
     glaze: 'tare',
-    photo: 'momo-tare.jpg',
-    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/508f8d8807dcc1cca093d4f75398f49c.jpeg',
+    parts: ['特製だれ'],
+    tone: '#E0892A',
+    spice: 'tare',
   },
   {
     id: 'tare-pepper',
@@ -141,6 +142,9 @@ export const flavors = [
     kana: 'たれこしょー',
     copy: 'たれの甘みに、コショーの香りをきりっと重ねて。',
     glaze: 'pepper',
+    parts: ['特製だれ', 'コショー'],
+    tone: '#C9822E',
+    spice: 'pepper',
   },
   {
     id: 'tare-ichimi',
@@ -148,6 +152,9 @@ export const flavors = [
     kana: 'たれいちみ',
     copy: 'たれに一味唐辛子をひとふり。あとから辛さが追いかけてくる。',
     glaze: 'ichimi',
+    parts: ['特製だれ', '一味唐辛子'],
+    tone: '#E2501E',
+    spice: 'ichimi',
   },
   {
     id: 'tare-garlic',
@@ -155,8 +162,9 @@ export const flavors = [
     kana: 'たれにんにく',
     copy: '甘めのたれとにんにくの組み合わせ。ごはんが止まらない味。',
     glaze: 'garlic',
-    photo: 'momo-tare-garlic.jpg',
-    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/56e4492280c81dd5fb66e2834c5a6411.jpeg',
+    parts: ['特製だれ', 'にんにく'],
+    tone: '#E3A33A',
+    spice: 'garlic',
   },
   {
     id: 'kara-garlic',
@@ -164,8 +172,9 @@ export const flavors = [
     kana: 'からにんにく',
     copy: '韓国唐辛子とにんにくで仕上げた、真っ赤な一皿。',
     glaze: 'kankara',
-    photo: 'momo-kankara.jpg',
-    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/bf5e9810ca0bb2180d738c535094b0d9.jpeg',
+    parts: ['韓国唐辛子', 'にんにく'],
+    tone: '#D8321A',
+    spice: 'kankara',
   },
   {
     id: 'shio',
@@ -173,8 +182,9 @@ export const flavors = [
     kana: 'しお',
     copy: '特製の漬けダレに漬け込んだもも肉を、素直に揚げて。オリジナルの塩を添えるとさらにおいしい。',
     glaze: 'shio',
-    photo: 'momo-shio.jpg',
-    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/cf4e58b0c0353aef5a0a66721df55b2b.jpeg',
+    parts: ['漬けダレ', 'オリジナルの塩'],
+    tone: '#F2DDB0',
+    spice: 'shio',
   },
   {
     id: 'ponzu',
@@ -182,8 +192,9 @@ export const flavors = [
     kana: 'ぽんず',
     copy: 'オリジナルのポン酢でさっぱりと。そのままでおいしく食べられます。',
     glaze: 'ponzu',
-    photo: 'momo-ponzu.jpg',
-    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/75bb79c5d93592fb734b7eac5dbca5f0.jpeg',
+    parts: ['オリジナルのポン酢'],
+    tone: '#F2B632',
+    spice: 'ponzu',
   },
 ];
 
@@ -198,6 +209,8 @@ export const menu = [
     options: flavors.map((f) => f.name),
     price: null,
     glaze: 'tare',
+    photo: 'momo-tare.jpg',
+    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/508f8d8807dcc1cca093d4f75398f49c.jpeg',
   },
   {
     id: 'mune',
@@ -239,6 +252,8 @@ export const menu = [
     options: ['砂ずり', '素揚げ砂ずり', 'ぼんじり', 'はつ', '手羽先'],
     price: null,
     glaze: 'kushi',
+    // 旧サイト /menu/ の3枚組バナー（ebd145da…jpg）から串の部分を切り出したもの
+    photo: 'kushi.jpg',
   },
   {
     id: 'bento',
@@ -249,6 +264,8 @@ export const menu = [
     options: ['小盛', '大盛', '特盛'],
     price: null,
     glaze: 'tare',
+    photo: 'bento.jpg',
+    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/c10237a4fb3077a1bf4c485e5e67462c.jpg',
   },
   {
     id: 'moriawase-3',
@@ -271,6 +288,8 @@ export const menu = [
     price: null,
     reservation: true,
     glaze: 'tare',
+    photo: 'moriawase-5.jpg',
+    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/top-e1603346842728.jpg',
   },
 ];
 
