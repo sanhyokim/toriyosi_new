@@ -94,8 +94,8 @@ const graph = (...nodes) => ({ '@context': 'https://schema.org', '@graph': [orgL
 // 写真が見つからなければ main.js が img を外し、下の手続き生成イラストが見える。
 const LEGACY_PHOTOS = !PREVIEW && !process.argv.includes('--no-legacy-photos');
 const photoSrc = (L, photo, legacy) => photoExists(photo) ? L(`assets/photos/${photo}`) : LEGACY_PHOTOS && legacy ? new URL(legacy).pathname : '';
-// 写真のない味（たれコショー・たれ一味）は、ベースが同じたれの写真を使う
-const flavorPhoto = (f) => (photoExists(f.photo) ? f.photo : flavors[0].photo);
+// 味の組み立て「もも × たれ × コショー」
+const formula = (f) => ['もも', ...f.parts].map((p, i) => `${i ? '<i aria-hidden="true">×</i>' : ''}<b>${esc(p)}</b>`).join('');
 const visual = (L, { photo, legacy, glaze, layout = 'trio', seed = 1, alt }) => {
   const src = photoSrc(L, photo, legacy);
   const img = src
@@ -213,9 +213,9 @@ page('/', (L) => {
     <div class="wrap">
       <div class="sec__head rv"><p class="eyebrow">Flavor Lab</p><h2 class="h2" id="f-title">もも、7つの味。</h2><p class="lead">看板の骨なしもも肉は、7種類の味から選べます。気になる味を押してみてください。</p></div>
       <div class="lab__grid">
-        <div class="lab__stage rv"><span class="lab__count mono">01 / 07</span><img class="lab__photo" src="${L(`assets/photos/${flavorPhoto(flavors[0])}`)}" alt="${esc(flavors[0].name)}のからあげ" width="850" height="680" decoding="async"><span class="lab__big" aria-hidden="true">${flavors[0].name}</span></div>
+        <div class="lab__stage rv" style="--tone:${flavors[0].tone};--len:${[...flavors[0].name].length}" data-spice="${flavors[0].spice}"><span class="lab__count mono">01 / 07</span><canvas class="lab__fx" aria-hidden="true"></canvas><div class="lab__plate" aria-live="polite"><p class="lab__formula">${formula(flavors[0])}</p><p class="lab__big">${esc(flavors[0].name)}</p><p class="lab__kana mono">${esc(flavors[0].kana)}</p></div></div>
         <div>
-          <ul class="flist" role="tablist" aria-label="もも肉の味" aria-orientation="vertical">${flavors.map((f, i) => `<li role="presentation"><button role="tab" type="button" id="tab-${f.id}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-photo="${L(`assets/photos/${flavorPhoto(f)}`)}" data-name="${esc(f.name)}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="nm">${esc(f.name)}</span>${f.badge ? `<span class="bd">${f.badge}</span>` : '<span></span>'}<span class="cp">${esc(f.copy)}</span></button></li>`).join('')}</ul>
+          <ul class="flist" role="tablist" aria-label="もも肉の味" aria-orientation="vertical">${flavors.map((f, i) => `<li role="presentation"><button role="tab" type="button" id="tab-${f.id}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-name="${esc(f.name)}" data-kana="${esc(f.kana)}" data-tone="${f.tone}" data-spice="${f.spice}" data-formula="${esc(formula(f))}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="nm">${esc(f.name)}</span>${f.badge ? `<span class="bd">${f.badge}</span>` : '<span></span>'}<span class="cp">${esc(f.copy)}</span></button></li>`).join('')}</ul>
           <p class="lab__note">骨なしもも肉 6〜7個（250g以上）。オリジナルの塩は別売りです。</p>
         </div>
       </div>
@@ -277,7 +277,7 @@ ${pageHero({ L, title: 'メニュー', lead: '特製の漬けダレで長時間�
 <section class="sec"><div class="wrap stack">
   <div>
     <div class="sec__head"><p class="eyebrow">骨なしもも肉の味</p><h2 class="h2">7種類から選べます</h2></div>
-    <ul class="ftiles">${flavors.map((f, i) => `<li class="ftile"><img src="${L(`assets/photos/${flavorPhoto(f)}`)}" alt="${esc(f.name)}のからあげ" width="850" height="680" loading="lazy" decoding="async"><div><h3>${esc(f.name)}${f.badge ? `<small>${f.badge}</small>` : ''}</h3><p>${esc(f.copy)}</p></div></li>`).join('')}</ul>
+    <ul class="ftiles">${flavors.map((f, i) => `<li class="ftile" style="--tone:${f.tone}"><p class="ftile__vis" data-spice="${f.spice}" aria-hidden="true"><span class="no mono">${String(i + 1).padStart(2, '0')}</span></p><div><p class="ftile__formula">${formula(f)}</p><h3>${esc(f.name)}${f.badge ? `<small>${f.badge}</small>` : ''}</h3><p>${esc(f.copy)}</p></div></li>`).join('')}</ul>
   </div>
   <div class="menu-grid">${menu.map((m, i) => menuCard(L, m, i)).join('')}</div>
   <ul class="notes">${menuNotes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
