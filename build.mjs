@@ -129,35 +129,13 @@ const ticket = (L, s, { heading = 'h3' } = {}) => `<article class="ticket rv" da
   </div>
 </article>`;
 
-// 店舗位置を緯度経度から正しい縮尺で描く地図
+// 店舗の地図は Google マップの埋め込み。住所で検索して表示し、タブで店舗を切り替える
+const embedUrl = (s) => `https://www.google.com/maps?q=${encodeURIComponent(`${s.region}${s.locality}${s.street}`)}&hl=ja&z=16&output=embed`;
 function shopMap() {
-  const W = 400, H = 600;
-  const lat0 = 33.575, lat1 = 33.79, lng0 = 130.36;
-  const ky = H / (lat1 - lat0);
-  const kx = ky * Math.cos((33.68 * Math.PI) / 180);
-  const P = (lat, lng) => [(lng - lng0) * kx, (lat1 - lat) * ky];
-  const kmPx = ky / 110.9;
-  // JR鹿児島本線（博多〜福間）の主な駅。位置関係の目安として線で描く
-  const jr = [['博多', 33.5897, 130.4207], ['吉塚', 33.6046, 130.4237], ['箱崎', 33.6155, 130.4241], ['千早', 33.6496, 130.4404], ['香椎', 33.6594, 130.4441], ['九産大前', 33.6739, 130.4398], ['福工大前', 33.6929, 130.4268], ['古賀', 33.7303, 130.4693], ['福間', 33.7651, 130.4785]];
-  const rail = jr.map(([, la, ln]) => P(la, ln).map((v) => v.toFixed(1)).join(' ')).join(' L');
-  const stations = jr.slice(1).map(([n, la, ln]) => { const [x, y] = P(la, ln); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3"/>${['香椎', '古賀'].includes(n) ? `<text x="${(x + 8).toFixed(1)}" y="${(y + 4).toFixed(1)}">${n}</text>` : ''}`; }).join('');
-  const pins = shops.map((s) => {
-    const [x, y] = P(s.geo.lat, s.geo.lng);
-    const right = x < W * 0.62;
-    return `<g class="pin" id="pin-${s.slug}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8"/><text x="${(x + (right ? 14 : -14)).toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="${right ? 'start' : 'end'}">${s.name}</text></g>`;
-  }).join('');
-  const [hx, hy] = P(33.5897, 130.4207);
-  const bar = kmPx * 2;
   return `<figure class="map rv" aria-labelledby="map-cap">
-  <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="鶏好4店舗の位置関係（福岡市東区・福津市）">
-    <g class="area"><text x="${W - 30}" y="440" text-anchor="end">福岡市東区</text><text x="${W - 40}" y="120" text-anchor="end">福津市</text></g>
-    <g class="rail"><path d="M${rail}"/><path class="dash" d="M${rail}"/>${stations}<text x="${(P(33.6594, 130.4441)[0] + 8).toFixed(1)}" y="${(P(33.6594, 130.4441)[1] + 20).toFixed(1)}" class="line">JR鹿児島本線</text></g>
-    <g class="ref hub"><rect x="${(hx - 6).toFixed(1)}" y="${(hy - 6).toFixed(1)}" width="12" height="12" rx="2"/><text x="${(hx + 12).toFixed(1)}" y="${(hy + 5).toFixed(1)}">博多駅</text></g>
-    ${pins}
-    <g transform="translate(${W - 24 - bar} ${H - 34})" class="ref"><rect width="${bar.toFixed(1)}" height="4" fill="currentColor" style="fill:var(--kraft-ink)"/><text y="-6">2 km</text></g>
-    <g transform="translate(${W - 30} 30)" class="ref"><path d="M0 -16 L7 6 L0 1 L-7 6 Z" style="fill:var(--kraft-ink)"/><text x="-4" y="22">N</text></g>
-  </svg>
-  <figcaption id="map-cap">店舗とJRの駅を縮尺どおりに配置した位置関係の目安です。</figcaption>
+  <div class="map__tabs" role="tablist" aria-label="地図に表示する店舗">${shops.map((s, i) => `<button type="button" role="tab" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-map="${esc(embedUrl(s))}">${esc(s.name)}</button>`).join('')}</div>
+  <iframe class="map__frame" src="${esc(embedUrl(shops[0]))}" title="${esc(shops[0].name)}の地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+  <figcaption id="map-cap">店舗名を押すと地図が切り替わります（Google マップ）。</figcaption>
 </figure>`;
 }
 

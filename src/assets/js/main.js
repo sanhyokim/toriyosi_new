@@ -241,18 +241,24 @@ export function initPage() {
     img.addEventListener('error', fail);
   });
 
-  /* 地図のピンと店舗カードを連動 */
-  $$('[data-shop]').forEach((el) => {
-    const slug = el.dataset.shop;
-    const pin = document.getElementById(`pin-${slug}`);
-    if (!pin) return;
-    const on = () => pin.classList.add('is-on');
-    const off = () => pin.classList.remove('is-on');
-    el.addEventListener('pointerenter', on);
-    el.addEventListener('pointerleave', off);
-    el.addEventListener('focusin', on);
-    el.addEventListener('focusout', off);
-  });
+  /* 店舗の地図（Google マップ埋め込み）の切り替え */
+  const mapTabs = $$('.map__tabs [role="tab"]');
+  const frame = $('.map__frame');
+  if (frame) {
+    const show = (i, focus) => {
+      mapTabs.forEach((t, j) => { t.setAttribute('aria-selected', String(i === j)); t.tabIndex = i === j ? 0 : -1; });
+      if (focus) mapTabs[i].focus();
+      frame.src = mapTabs[i].dataset.map;
+      frame.title = `${mapTabs[i].textContent}の地図`;
+    };
+    mapTabs.forEach((t, i) => {
+      t.addEventListener('click', () => show(i));
+      t.addEventListener('keydown', (e) => {
+        const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+        if (d) { e.preventDefault(); show((i + d + mapTabs.length) % mapTabs.length, true); }
+      });
+    });
+  }
 
   /* 電話番号コピー */
   $$('[data-copy]').forEach((b) => {

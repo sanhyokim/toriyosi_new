@@ -255,22 +255,13 @@ p { margin: 0; text-wrap: pretty; }
 /* 店舗：地図＋注文票 */
 .shops { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
 .map { position: sticky; top: 100px; background: var(--rice); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
-.map svg { width: 100%; height: auto; }
+.map__tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.map__tabs button { all: unset; cursor: pointer; font-size: .82rem; font-weight: 700; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); transition: background .2s, color .2s; }
+.map__tabs button:hover { border-color: var(--soy); }
+.map__tabs button[aria-selected="true"] { background: var(--soy); color: var(--rice); border-color: var(--soy); }
+.map__tabs button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 .map figcaption { font-size: .75rem; color: var(--kraft-ink); margin-top: 8px; font-family: var(--f-mono); letter-spacing: 0; }
-.map .pin circle { fill: var(--chili); stroke: var(--rice); stroke-width: 3; transition: r .3s; }
-.map .pin text { font-family: var(--f-body); font-weight: 900; font-size: 15px; fill: var(--soy); paint-order: stroke; stroke: var(--rice); stroke-width: 5px; }
-.map .pin.is-on circle { r: 11; }
-.map .ref text { font-size: 12px; fill: var(--kraft-ink); font-family: var(--f-mono); }
-.map .ref circle { fill: var(--kraft-ink); }
-.map svg { background: radial-gradient(circle, color-mix(in srgb, var(--kraft-ink) 22%, transparent) 1px, transparent 1.5px) 0 0 / 16px 16px; border-radius: calc(var(--radius) - 6px); }
-.map .area text { font-family: var(--f-body); font-weight: 900; font-size: 24px; fill: var(--kraft-ink); opacity: .28; letter-spacing: .2em; }
-.map .rail path { fill: none; stroke: var(--kraft-ink); stroke-width: 6; stroke-linejoin: round; stroke-linecap: round; opacity: .55; }
-.map .rail path.dash { stroke: var(--rice); stroke-width: 2.4; stroke-dasharray: 9 9; opacity: 1; }
-.map .rail circle { fill: var(--rice); stroke: var(--kraft-ink); stroke-width: 2; }
-.map .rail text { font-size: 11px; fill: var(--kraft-ink); font-family: var(--f-body); font-weight: 700; }
-.map .rail text.line { font-size: 10px; font-family: var(--f-mono); font-weight: 400; opacity: .8; }
-.map .hub rect { fill: var(--soy); }
-.map .hub text { font-family: var(--f-body); font-weight: 900; font-size: 13px; fill: var(--soy); }
+.map__frame { display: block; width: 100%; aspect-ratio: 4 / 5; border: 0; border-radius: calc(var(--radius) - 6px); background: var(--kraft); }
 .tickets { display: grid; gap: 18px; }
 .on-kraft { background: var(--kraft); --cut: var(--kraft); }
 .ticket { position: relative; background: var(--surface); border-radius: var(--radius); display: grid; grid-template-columns: minmax(0, 1fr) auto; border: 1px solid var(--line); }
