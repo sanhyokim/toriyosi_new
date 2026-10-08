@@ -1,0 +1,15 @@
+{
+  "name": "toriyoshi-renewal",
+  "private": true,
+  "type": "module",
+  "description": "からあげ専門店 鶏好（toriyoshi.love）のリニューアルサイト。依存なしの静的サイトジェネレーター。",
+  "scripts": {
+    "build": "node build.mjs",
+    "preview": "node build.mjs --preview",
+    "check": "node build.mjs && node scripts/check.mjs",
+    "fonts": "node build.mjs && node scripts/fonts.mjs && node build.mjs",
+    "images": "node scripts/make-images.mjs",
+    "serve": "node build.mjs && npx -y serve@14.2.4 dist"
+  },
+  "engines": { "node": ">=20" }
+}
