@@ -521,7 +521,8 @@ ${pageHero({ L, title: 'このページは揚がっていません。', lead: '�
 await rm(OUT, { recursive: true, force: true });
 await mkdir(OUT, { recursive: true });
 await cp('src/assets', join(OUT, 'assets'), { recursive: true });
-if (!PREVIEW) await cp('src/static', OUT, { recursive: true }); // .htaccess など、サーバーにそのまま置くファイル
+if (!PREVIEW) await cp('src/static', OUT, { recursive: true });
+else await cp('src/preview/preview-router.js', join(OUT, 'assets/js/preview-router.js')); // .htaccess など、サーバーにそのまま置くファイル
 // CSS を軽く圧縮。main.css は各ページの <style> にインライン化（描画をブロックしない）、
 // フォント定義は非同期で読み込む。
 const minify = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s*\n\s*/g, '').replace(/\s*([{};,>])\s*/g, '$1').replace(/:\s+/g, ':').replace(/;}/g, '}');
@@ -537,7 +538,7 @@ for (const p of pages) {
   await mkdir(join(OUT, dirname(file)), { recursive: true });
   // Artifact プレビューではトップページを本文だけにする（ホスト側が html/head/body を付けるため）
   const out = PREVIEW && file === 'index.html'
-    ? html.replace(/<!doctype html>\s*/i, '').replace(/<html[^>]*>\s*<head>/i, '').replace(/<\/head>\s*<body>/i, '').replace(/<\/body>\s*<\/html>\s*$/i, '').replace(/<title>[^<]*<\/title>/, '<title>鶏好 サイトリニューアル</title>')
+    ? html.replace(/<!doctype html>\s*/i, '').replace(/<html[^>]*>\s*<head>/i, '').replace(/<\/head>\s*<body>/i, '').replace(/<\/body>\s*<\/html>\s*$/i, '').replace(/<title>[^<]*<\/title>/, '<title>鶏好 サイトリニューアル</title>').replace(/<\/body>|$/, '<script type="module" src="assets/js/preview-router.js"></script>')
     : html;
   await writeFile(join(OUT, file), out);
 }
