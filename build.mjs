@@ -132,9 +132,12 @@ const ticket = (L, s, { heading = 'h3' } = {}) => `<article class="ticket rv" da
 const embedUrl = (s) => `https://www.google.com/maps?q=${encodeURIComponent(`${s.region}${s.locality}${s.street}`)}&hl=ja&z=16&output=embed`;
 function shopMap() {
   return `<figure class="map rv" aria-labelledby="map-cap">
-  <div class="map__tabs" role="tablist" aria-label="地図に表示する店舗">${shops.map((s, i) => `<button type="button" role="tab" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-map="${esc(embedUrl(s))}">${esc(s.name)}</button>`).join('')}</div>
-  <iframe class="map__frame" src="${esc(embedUrl(shops[0]))}" title="${esc(shops[0].name)}の地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-  <figcaption id="map-cap">店舗名を押すと地図が切り替わります（Google マップ）。</figcaption>
+  ${PREVIEW ? '' : `<div class="map__tabs" role="tablist" aria-label="地図に表示する店舗">${shops.map((s, i) => `<button type="button" role="tab" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-map="${esc(embedUrl(s))}">${esc(s.name)}</button>`).join('')}</div>`}
+  ${PREVIEW
+    // Artifact プレビューは外部サイトの埋め込みを読み込めないため、代わりに Google マップへのリンクを出す
+    ? `<div class="map__frame map__frame--preview"><p>プレビューでは Google マップを埋め込めません。<br>公開後のサイトでは、ここに地図が表示されます。</p><p class="map__links">${shops.map((s) => `<a href="${mapUrl(s)}" target="_blank" rel="noopener">${esc(s.name)}の地図を開く</a>`).join('')}</p></div>`
+    : `<iframe class="map__frame" src="${esc(embedUrl(shops[0]))}" title="${esc(shops[0].name)}の地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`}
+  <figcaption id="map-cap">${PREVIEW ? 'Google マップ' : '店舗名を押すと地図が切り替わります（Google マップ）。'}</figcaption>
 </figure>`;
 }
 
@@ -161,7 +164,7 @@ page('/', (L) => {
         <h1 class="hero__name" id="hero-title"><span class="sub">福岡のからあげテイクアウト専門店</span>鶏好<span class="ruby">TORIYOSHI</span></h1>
         <div class="hero__pile" tabindex="0" role="img" aria-label="揚げたての鶏好のからあげ。タップすると揚げ音が弾けます">
           <span class="loading" aria-hidden="true">揚げたて準備中…</span>
-          <img class="base" src="${L('assets/photos/hero-karaage.webp')}" alt="" width="1280" height="1396" decoding="async" fetchpriority="high"><canvas class="fx"></canvas>
+          <img class="base" src="${L('assets/photos/hero-karaage.webp')}" alt="" width="1080" height="1178" decoding="async" fetchpriority="high"><canvas class="fx"></canvas>
         </div>
       </div>
       <p class="hero__tate" aria-label="食卓に幸福を、食卓に笑顔を、食卓に愛を">食卓に<span class="flip" data-words='${JSON.stringify(site.taglineWords)}'><span>${site.taglineWords[0]}</span></span>を</p>

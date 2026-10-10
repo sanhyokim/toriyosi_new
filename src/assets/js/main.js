@@ -251,7 +251,7 @@ export function initPage() {
 
   /* 店舗の地図（Google マップ埋め込み）の切り替え */
   const mapTabs = $$('.map__tabs [role="tab"]');
-  const frame = $('.map__frame');
+  const frame = $('iframe.map__frame');
   if (frame) {
     const show = (i, focus) => {
       mapTabs.forEach((t, j) => { t.setAttribute('aria-selected', String(i === j)); t.tabIndex = i === j ? 0 : -1; });

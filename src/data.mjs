@@ -59,7 +59,7 @@ export const shops = [
     hours: null,
     closed: null,
     delivery: [],
-    photo: 'shop-miwadai.jpg',
+    photo: 'shop-miwadai.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/4ce62eed8967055a3102964b62ce54aa.jpg',
   },
   {
@@ -80,7 +80,7 @@ export const shops = [
       { name: 'Wolt', url: 'https://wolt.com/ja/jpn/fukuoka/restaurant/karaage-toriyoshi-yoshizuka' },
       { name: '出前館', url: 'https://demae-can.com/shop/menu/3094573' },
     ],
-    photo: 'shop-yoshizuka.jpg',
+    photo: 'shop-yoshizuka.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2026/10/yoshizuka-shop-2026.jpg',
   },
   {
@@ -96,7 +96,7 @@ export const shops = [
     hours: null,
     closed: null,
     delivery: [],
-    photo: 'shop-maimatsubara.jpg',
+    photo: 'shop-maimatsubara.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/8cc2d3943d390f1f30b67d3f464886b1.jpg',
   },
   {
@@ -112,7 +112,7 @@ export const shops = [
     hours: null,
     closed: null,
     delivery: [{ name: 'Uber Eats', url: 'https://ubereats.app.link/AsmQn87Cqtb' }],
-    photo: 'shop-fukutsu.jpg',
+    photo: 'shop-fukutsu.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/1530f2f07792d7b3c16e4c89b5c86566.jpg',
   },
 ];
@@ -209,7 +209,7 @@ export const menu = [
     options: flavors.map((f) => f.name),
     price: null,
     glaze: 'tare',
-    photo: 'momo-tare.jpg',
+    photo: 'momo-tare.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/508f8d8807dcc1cca093d4f75398f49c.jpeg',
   },
   {
@@ -219,7 +219,7 @@ export const menu = [
     desc: 'やわらかくて食べごたえのある、むね肉のからあげ。',
     price: null,
     glaze: 'mune',
-    photo: 'mune.jpg',
+    photo: 'mune.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/dd84f452bb1c7555621739c163d07cf2.jpeg',
   },
   {
@@ -230,7 +230,7 @@ export const menu = [
     options: ['塩', '名古屋風'],
     price: null,
     glaze: 'tebasaki',
-    photo: 'tebasaki-shio.jpg',
+    photo: 'tebasaki-shio.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/617e212759e18d88dba1a0d21a37629f.jpeg',
   },
   {
@@ -240,7 +240,7 @@ export const menu = [
     desc: '身が付いたままの軟骨。コリッとした歯ざわりとうま味を両方楽しめます。',
     price: null,
     glaze: 'nankotsu',
-    photo: 'nankotsu.jpg',
+    photo: 'nankotsu.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/a137efb24c8b1d30d87241c86afa2443.jpeg',
   },
   {
@@ -253,7 +253,7 @@ export const menu = [
     price: null,
     glaze: 'kushi',
     // 旧サイト /menu/ の3枚組バナー（ebd145da…jpg）から串の部分を切り出したもの
-    photo: 'kushi.jpg',
+    photo: 'kushi.webp',
   },
   {
     id: 'bento',
@@ -264,7 +264,7 @@ export const menu = [
     options: ['小盛', '大盛', '特盛'],
     price: null,
     glaze: 'tare',
-    photo: 'bento.jpg',
+    photo: 'bento.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/c10237a4fb3077a1bf4c485e5e67462c.jpg',
   },
   {
@@ -276,7 +276,7 @@ export const menu = [
     price: null,
     reservation: true,
     glaze: 'tare',
-    photo: 'moriawase.jpg',
+    photo: 'moriawase.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/27e88bbd088f29e625b1d46117849249.jpeg',
   },
   {
@@ -288,7 +288,7 @@ export const menu = [
     price: null,
     reservation: true,
     glaze: 'tare',
-    photo: 'moriawase-5.jpg',
+    photo: 'moriawase-5.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/top-e1603346842728.jpg',
   },
 ];
