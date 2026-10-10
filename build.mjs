@@ -98,10 +98,9 @@ const photoSrc = (L, photo, legacy) => photoExists(photo) ? L(`assets/photos/${p
 const formula = (f) => ['もも', ...f.parts].map((p, i) => `${i ? '<i aria-hidden="true">×</i>' : ''}<b>${esc(p)}</b>`).join('');
 const visual = (L, { photo, legacy, glaze, layout = 'trio', seed = 1, alt }) => {
   const src = photoSrc(L, photo, legacy);
-  const img = src
-    ? `<img src="${src}" alt="${esc(alt)}" loading="lazy" decoding="async" width="800" height="600" data-fallback>`
-    : '';
-  return `<canvas data-glaze="${glaze}" data-layout="${layout}" data-seed="${seed}" role="img" aria-label="${esc(alt)}のイメージ"></canvas>${img}`;
+  // 写真があれば写真だけを出す（手続き生成のイラストは読み込みに失敗したときの代わり）
+  if (src) return `<img src="${src}" alt="${esc(alt)}" loading="lazy" decoding="async" width="800" height="600" data-fallback data-glaze="${glaze}" data-layout="${layout}" data-seed="${seed}">`;
+  return `<canvas data-glaze="${glaze}" data-layout="${layout}" data-seed="${seed}" role="img" aria-label="${esc(alt)}のイメージ"></canvas>`;
 };
 
 const menuCard = (L, m, i) => `<article class="item rv" id="${m.id}">

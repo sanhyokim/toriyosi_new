@@ -233,6 +233,8 @@ p { margin: 0; text-wrap: pretty; }
 .item:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -22px rgba(60, 30, 0, .45); }
 .item__vis { position: relative; aspect-ratio: 4 / 3; background: var(--kraft); overflow: hidden; }
 .item__vis canvas, .item__vis img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+img[data-fallback] { transition: opacity .45s var(--ease); }
+img[data-fallback].is-loading { opacity: 0; }
 .item__vis .badge { position: absolute; left: 12px; top: 12px; z-index: 2; font-size: .72rem; font-weight: 700; background: var(--soy); color: var(--rice); padding: 3px 10px; border-radius: 999px; }
 .item__body { padding: 18px 20px 22px; display: grid; gap: 8px; align-content: start; }
 .item__body h3 { font-family: var(--f-display); font-size: 1.35rem; line-height: 1.3; }

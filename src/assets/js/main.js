@@ -234,11 +234,19 @@ export function initPage() {
     vis.forEach((c) => io.observe(c));
   }
 
-  /* 写真の読み込みに失敗したら手続き生成に任せる */
+  /* 写真はふわっと表示。読み込みに失敗したときだけ手続き生成のイラストに置き換える */
   $$('img[data-fallback]').forEach((img) => {
-    const fail = () => img.remove();
-    if (img.complete && img.naturalWidth === 0) fail();
-    img.addEventListener('error', fail);
+    const fail = () => {
+      const c = document.createElement('canvas');
+      c.setAttribute('role', 'img');
+      c.setAttribute('aria-label', `${img.alt}のイメージ`);
+      img.replaceWith(c);
+      renderPile(c, { glaze: img.dataset.glaze, layout: img.dataset.layout || 'trio', seed: +img.dataset.seed || 1 });
+    };
+    if (img.complete) { if (img.naturalWidth === 0) fail(); return; }
+    img.classList.add('is-loading');
+    img.addEventListener('load', () => img.classList.remove('is-loading'), { once: true });
+    img.addEventListener('error', fail, { once: true });
   });
 
   /* 店舗の地図（Google マップ埋め込み）の切り替え */
