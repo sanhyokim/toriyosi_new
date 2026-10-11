@@ -651,7 +651,7 @@ await writeFile(join(OUT, 'llms-full.txt'), llmsFull);
 
 await writeFile(join(OUT, 'manifest.webmanifest'), JSON.stringify({
   name: 'からあげ専門店 鶏好', short_name: '鶏好', lang: 'ja', start_url: '/', display: 'standalone', background_color: '#FFFBF2', theme_color: site.themeColor,
-  icons: [{ src: '/assets/img/favicon.svg', sizes: 'any', type: 'image/svg+xml' }, { src: '/assets/img/icon-512.png', sizes: '512x512', type: 'image/png' }],
+  icons: [{ src: '/assets/img/favicon.png', sizes: '64x64', type: 'image/png' }, { src: '/assets/img/icon-512.png', sizes: '512x512', type: 'image/png' }],
 }, null, 2));
 
 console.log(`built ${pages.length} pages → ${OUT}/`);

@@ -35,7 +35,8 @@ export const ICON = {
 };
 
 // ロゴマーク: 揚げ色の丸にからあげのシルエット
-export const MARK = `<svg class="logo__mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#F2A900" stroke="#1C0F08" stroke-width="2"/><path fill="#1C0F08" d="M18 36c-3-6 1-13 7-14 2-5 9-7 13-3 6-1 11 4 9 10 4 4 1 11-5 11-3 4-10 5-14 2-6 1-11-1-10-6z"/><circle cx="27" cy="29" r="2.2" fill="#F2A900"/><circle cx="37" cy="27" r="1.6" fill="#F2A900"/><circle cx="34" cy="37" r="1.9" fill="#F2A900"/></svg>`;
+// ロゴ（お店支給の筆文字ロゴを透過にしたもの）。色は currentColor で、ヘッダーの文字色に合わせる。
+const MARK = (L) => `<span class="logo__mark" style="--logo:url(${L('assets/img/logo-mark.webp')})" aria-hidden="true"></span>`;
 
 export function head({ title, description, path, ogType = 'website', jsonld, L, noindex = false, preload = [] }) {
   const url = site.url + (path === '/' ? '/' : '/' + path.replace(/^\//, ''));
@@ -62,7 +63,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : '<meta name="robots" cont
 <meta property="og:image:alt" content="からあげ専門店 鶏好 — 幸福 × 笑顔 × 愛 = 鶏好のからあげ">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="${L('assets/img/favicon.svg')}" type="image/svg+xml">
+<link rel="icon" href="${L('assets/img/favicon.png')}" type="image/png" sizes="64x64">
 <link rel="apple-touch-icon" href="${L('assets/img/apple-touch-icon.png')}">
 <link rel="manifest" href="${L('manifest.webmanifest')}">
 <link rel="alternate" type="text/plain" href="${L('llms.txt')}" title="llms.txt">
@@ -87,7 +88,7 @@ export function header({ L, current = '', onGold = true }) {
   const tels = shops.map((s) => `<a href="${telHref(s.tel)}"><span>${esc(s.name)}</span><span class="mono">${s.tel}</span></a>`).join('');
   return `<header class="hdr${onGold ? ' hdr--onGold' : ''}">
   <div class="wrap hdr__in">
-    <a class="logo" href="${L('/')}">${MARK}<span class="logo__txt"><span class="logo__name">鶏好</span><span class="logo__sub">からあげ専門店</span></span><span class="sr-only">（ホーム）</span></a>
+    <a class="logo" href="${L('/')}">${MARK(L)}<span class="logo__txt"><span class="logo__name">鶏好</span><span class="logo__sub">からあげ専門店</span></span><span class="sr-only">（ホーム）</span></a>
     <nav class="nav" aria-label="メインメニュー">
       <ul class="nav__list">${items}</ul>
       <a class="btn nav__tel" href="${L('shop/')}">${ICON.tel}電話で注文</a>

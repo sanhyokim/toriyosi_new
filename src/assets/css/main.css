@@ -84,7 +84,7 @@ p { margin: 0; text-wrap: pretty; }
 .hdr--onGold:not(.is-solid) { color: #1C0F08; }
 .hdr--onGold:not(.is-solid) .btn { --b: #1C0F08; --t: #FFE7A8; }
 .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
-.logo__mark { width: 38px; height: 38px; flex: none; }
+.logo__mark { width: 46px; height: 46px; flex: none; background: currentColor; -webkit-mask: var(--logo) center / contain no-repeat; mask: var(--logo) center / contain no-repeat; }
 .logo__txt { display: grid; line-height: 1; }
 .logo__name { font-family: var(--f-display); font-size: 1.5rem; letter-spacing: 0.06em; }
 .logo__sub { font-size: 0.62rem; letter-spacing: 0.24em; margin-top: 4px; font-weight: 700; opacity: .75; }
