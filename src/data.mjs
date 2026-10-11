@@ -76,8 +76,8 @@ export const shops = [
     closed: null,
     note: '2025年12月に移転しました。新しい住所は上記のとおりです。',
     delivery: [
-      { name: 'Uber Eats', url: 'https://www.ubereats.com/jp/fukuoka/food-delivery/%E3%81%8B%E3%82%89%E3%81%82%E3%81%91%E9%B7%84%E5%A5%BD-fried-chicken-toriyoshi/mJOuT7OLQYmHB9-5517nCg' },
-      { name: 'Wolt', url: 'https://wolt.com/ja/jpn/fukuoka/restaurant/karaage-toriyoshi-yoshizuka' },
+      // 旧URLは移転（2025-12）でリンク切れ。正しい店舗URLが分かるまで Uber Eats の「鶏好」検索に飛ばす
+      { name: 'Uber Eats', url: 'https://www.ubereats.com/jp/search?q=%E9%B6%8F%E5%A5%BD' },
       { name: '出前館', url: 'https://demae-can.com/shop/menu/3094573' },
     ],
     photo: 'shop-yoshizuka.webp',
@@ -365,7 +365,7 @@ export const faqs = [
   },
   {
     q: '宅配（デリバリー）はできますか？',
-    a: '吉塚店は Uber Eats・Wolt・出前館、福津店は Uber Eats で宅配に対応しています。美和台本店と舞松原店はテイクアウト（店頭・電話予約）のみです。',
+    a: '吉塚店は Uber Eats・出前館、福津店は Uber Eats で宅配に対応しています。美和台本店と舞松原店はテイクアウト（店頭・電話予約）のみです。',
   },
   {
     q: 'どこにお店がありますか？',
