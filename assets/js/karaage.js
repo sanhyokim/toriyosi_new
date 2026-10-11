@@ -406,11 +406,20 @@ export class Sizzle {
     this.c.width = Math.round(this.w * ratio); this.c.height = Math.round(this.h * ratio);
     this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   }
-  burst(x, y, n = 28) {
+  // 油はね。color を渡すと、その色の粒（漬物のかけら等）を小さめに飛ばす
+  burst(x, y, n = 28, color) {
     for (let i = 0; i < n; i++) {
       const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.6;
-      const v = 2.5 + Math.random() * 6.5;
-      this.sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, s: 1 + Math.random() * 2.4 });
+      const v = (color ? 1.5 : 2.5) + Math.random() * (color ? 3.5 : 6.5);
+      this.sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, s: 1 + Math.random() * 2.4, c: color });
+    }
+    if (this.reduce) return;
+    if (!this.running) this.start();
+  }
+  // ご飯から立ちのぼる、濃いめの湯気
+  puff(x, y, n = 12) {
+    for (let i = 0; i < n; i++) {
+      this.p.push({ x: x + (Math.random() - 0.5) * 60, y: y + (Math.random() - 0.5) * 20, r: 14 + Math.random() * 18, life: 1, sway: Math.random() * TAU, v: 1.3 + Math.random() * 1.2, k: 4, fade: 0.011 });
     }
     if (this.reduce) return;
     if (!this.running) this.start();
@@ -440,8 +449,8 @@ export class Sizzle {
     for (const q of this.p) {
       q.y -= q.v * dt;
       q.x += Math.sin(this.t * 0.03 + q.sway) * 0.35 * dt;
-      q.r += 0.24 * dt;
-      q.life -= 0.0045 * dt;
+      q.r += (q.k ? 0.5 : 0.24) * dt;
+      q.life -= (q.fade || 0.0045) * dt;
     }
     this.p = this.p.filter((q) => q.life > 0 && q.y > -80);
     for (const s of this.sparks) { s.x += s.vx * dt; s.y += s.vy * dt; s.vy += 0.3 * dt; s.life -= 0.024 * dt; }
@@ -451,7 +460,7 @@ export class Sizzle {
     const { ctx, w, h } = this;
     ctx.clearRect(0, 0, w, h);
     for (const q of this.p) {
-      const a = Math.sin(q.life * Math.PI) * 0.12;
+      const a = Math.min(0.55, Math.sin(q.life * Math.PI) * 0.12 * (q.k || 1));
       const g = ctx.createRadialGradient(q.x, q.y, 0, q.x, q.y, q.r);
       g.addColorStop(0, `rgba(255,252,244,${a})`);
       g.addColorStop(1, 'rgba(255,252,244,0)');
@@ -470,7 +479,7 @@ export class Sizzle {
       ctx.beginPath(); ctx.moveTo(x - L, y); ctx.lineTo(x + L, y); ctx.moveTo(x, y - L); ctx.lineTo(x, y + L); ctx.stroke();
     }
     for (const s of this.sparks) {
-      ctx.fillStyle = `rgba(255,${(200 + 55 * s.life) | 0},${(130 * s.life) | 0},${s.life})`;
+      ctx.fillStyle = s.c ? `rgba(${s.c},${s.life})` : `rgba(255,${(200 + 55 * s.life) | 0},${(130 * s.life) | 0},${s.life})`;
       ctx.beginPath(); ctx.arc(s.x, s.y, s.s * s.life + 0.4, 0, TAU); ctx.fill();
     }
   }
