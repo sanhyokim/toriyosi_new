@@ -130,28 +130,46 @@ export function initPage() {
     signal.addEventListener('abort', () => clearInterval(timer));
   }
 
-  /* ヒーロー: からあげの山 + 湯気 + タップで「ジュワッ」 */
+  /* ヒーロー: からあげ弁当 + 湯気 + タップした場所で演出を変える（からあげ／ご飯／漬物） */
   const pile = $('.hero__pile');
   if (pile) {
     const base = $('img.base', pile), fx = $('canvas.fx', pile);
     idle(async () => {
       await base.decode().catch(() => {});
       pile.classList.add('is-ready');
-      const sz = new Sizzle(fx, { source: { glints: [] }, density: 1.1, steamFrom: [0.25, 0.75, 0.48], offsetY: fx.clientHeight - base.clientHeight });
+      const sz = new Sizzle(fx, { source: { glints: [] }, density: 1.1, steamFrom: [0.12, 0.85, 0.5], offsetY: fx.clientHeight - base.clientHeight });
       if (signal.aborted) return;
       sz.start();
       signal.addEventListener('abort', () => sz.stop());
       if (!reduce) sz.draw(performance.now());
       const io = new IntersectionObserver(([e]) => (e.isIntersecting ? sz.start() : sz.stop()));
       io.observe(pile);
-      const words = ['ジュワッ', 'サクッ', 'カリッ', 'じゅわ〜'];
-      let k = 0;
+      // 写真（1406×888）上の、ご飯と漬物の範囲。それ以外はからあげ扱い
+      const RICE = [[95, 470], [130, 400], [210, 300], [265, 232], [330, 240], [450, 265], [560, 300], [620, 330], [700, 420], [770, 510], [745, 620], [700, 690], [620, 690], [480, 640], [300, 580], [140, 520]];
+      const inPoly = (px, py, poly) => {
+        let inside = false;
+        for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+          const [xi, yi] = poly[i], [xj, yj] = poly[j];
+          if ((yi > py) !== (yj > py) && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) inside = !inside;
+        }
+        return inside;
+      };
+      const zone = (x, y) => {
+        const px = (x / base.clientWidth) * 1406, py = ((y - (pile.clientHeight - base.clientHeight)) / base.clientHeight) * 888;
+        if (((px - 505) / 155) ** 2 + ((py - 195) / 80) ** 2 <= 1) return 'pickle';
+        return inPoly(px, py, RICE) ? 'rice' : 'karaage';
+      };
+      const WORDS = { karaage: ['ジュワッ', 'サクッ', 'カリッ', 'じゅわ〜'], rice: ['ホカホカ', 'ふっくら', 'つやつや', 'ほわ〜'], pickle: ['カリッ'] };
+      const count = { karaage: 0, rice: 0, pickle: 0 };
       const hit = (x, y) => {
-        sz.burst(x, y + sz.offsetY);
+        const z = zone(x, y);
+        if (z === 'rice') sz.puff(x, y + sz.offsetY);
+        else if (z === 'pickle') sz.burst(x, y + sz.offsetY, 10, '214,40,140');
+        else sz.burst(x, y + sz.offsetY);
         if (reduce) return;
         const el = document.createElement('span');
-        el.className = 'onomato';
-        el.textContent = words[k++ % words.length];
+        el.className = `onomato onomato--${z}`;
+        el.textContent = WORDS[z][count[z]++ % WORDS[z].length];
         el.style.left = `${x}px`;
         el.style.top = `${y}px`;
         el.style.setProperty('--r', `${(Math.random() * 16 - 8).toFixed(1)}deg`);

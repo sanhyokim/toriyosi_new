@@ -168,9 +168,9 @@ page('/', (L) => {
       <p class="hero__kicker"><span class="status" role="status"><i></i>揚げたて準備中</span><span>福岡市東区・福津市に4店舗</span></p>
       <div class="hero__stage">
         <h1 class="hero__name" id="hero-title"><span class="sub">福岡のからあげテイクアウト専門店</span>鶏好<span class="ruby">TORIYOSHI</span></h1>
-        <div class="hero__pile" tabindex="0" role="img" aria-label="揚げたての鶏好のからあげ。タップすると揚げ音が弾けます">
+        <div class="hero__pile" tabindex="0" role="img" aria-label="鶏好のからあげ弁当。からあげ・ご飯・漬物をタップすると、それぞれの音が弾けます">
           <span class="loading" aria-hidden="true">揚げたて準備中…</span>
-          <img class="base" src="${L('assets/photos/hero-karaage.webp')}" alt="" width="1080" height="1178" decoding="async" fetchpriority="high"><canvas class="fx"></canvas>
+          <img class="base" src="${L('assets/photos/hero-bento.webp')}" alt="" width="1406" height="888" decoding="async" fetchpriority="high"><canvas class="fx"></canvas>
         </div>
       </div>
       <p class="hero__tate" aria-label="食卓に幸福を、食卓に笑顔を、食卓に愛を">食卓に<span class="flip" data-words='${JSON.stringify(site.taglineWords)}'><span>${site.taglineWords[0]}</span></span>を</p>
@@ -179,7 +179,7 @@ page('/', (L) => {
         <div class="hero__cta"><a class="btn" href="#shops">${ICON.tel}電話で予約する</a><a class="btn btn--ghost" href="#menu">メニューを見る</a></div>
       </div>
     </div>
-    <p class="hero__hint" aria-hidden="true">TAP THE KARAAGE ↓</p>
+    <p class="hero__hint" aria-hidden="true">TAP THE BENTO →</p>
   </section>
 
   <div class="marquee" role="presentation"><div class="marquee__track">${mq}${mq}</div></div>
