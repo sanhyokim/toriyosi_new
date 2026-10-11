@@ -649,3 +649,15 @@ await writeFile(join(OUT, 'manifest.webmanifest'), JSON.stringify({
 }, null, 2));
 
 console.log(`built ${pages.length} pages → ${OUT}/`);
+
+// 確認用の仮公開（GitHub Pages など）向け: 全ページを検索結果に出さない
+if (process.argv.includes('--staging')) {
+  const walk = async (d) => (await readdir(d, { withFileTypes: true })).flatMap((e) => (e.isDirectory() ? [] : [join(d, e.name)])).concat(...await Promise.all((await readdir(d, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => walk(join(d, e.name)))));
+  for (const f of (await walk(OUT)).filter((f) => f.endsWith('.html'))) {
+    const html = await readFile(f, 'utf8');
+    await writeFile(f, html.replace(/<meta name="robots" content="[^"]*">/, '<meta name="robots" content="noindex, nofollow">'));
+  }
+  await writeFile(join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
+  await writeFile(join(OUT, '.nojekyll'), '');
+  console.log('staging: 全ページ noindex');
+}
