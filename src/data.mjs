@@ -16,7 +16,7 @@ export const site = {
   taglineWords: ['幸福', '笑顔', '愛'],
   since: 2020,
   ogImage: '/assets/img/og.png',
-  themeColor: '#F2A900',
+  themeColor: '#4C1A2C',
   emails: {
     general: 'info@toriyoshi.love',
     recruit: 'info@toriyoshi.love',
