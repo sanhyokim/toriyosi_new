@@ -1,4 +1,6 @@
-// OGP画像とアイコンを、サイトと同じからあげ描画エンジンで生成する。
+// OGP画像を、サイトと同じからあげ描画エンジンで生成する。
+// ロゴ・アイコン類（logo.png / icon-512.png / apple-touch-icon.png / favicon.png / logo-mark.webp）は
+// お店支給のロゴ画像から作ったもので、このスクリプトでは上書きしない。
 //   node scripts/make-images.mjs   （Playwright が必要）
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -29,9 +31,6 @@ async function shot(hash, w, h, out, scale = 1) {
   await p.close();
 }
 await shot('', 1200, 630, 'src/assets/img/og.png');
-await shot('#icon', 512, 512, 'src/assets/img/icon-512.png');
-await shot('#icon', 512, 512, 'src/assets/img/logo.png');
-await shot('#icon', 180, 180, 'src/assets/img/apple-touch-icon.png', 1);
 await browser.close();
 server.close();
 console.log('images written to src/assets/img/');

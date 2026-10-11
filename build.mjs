@@ -94,12 +94,13 @@ const graph = (...nodes) => ({ '@context': 'https://schema.org', '@graph': [orgL
 // 写真が見つからなければ main.js が img を外し、下の手続き生成イラストが見える。
 const LEGACY_PHOTOS = !PREVIEW && !process.argv.includes('--no-legacy-photos');
 const photoSrc = (L, photo, legacy) => photoExists(photo) ? L(`assets/photos/${photo}`) : LEGACY_PHOTOS && legacy ? new URL(legacy).pathname : '';
+// 味の組み立て「もも × たれ × コショー」
+const formula = (f) => ['もも', ...f.parts].map((p, i) => `${i ? '<i aria-hidden="true">×</i>' : ''}<b>${esc(p)}</b>`).join('');
 const visual = (L, { photo, legacy, glaze, layout = 'trio', seed = 1, alt }) => {
   const src = photoSrc(L, photo, legacy);
-  const img = src
-    ? `<img src="${src}" alt="${esc(alt)}" loading="lazy" decoding="async" width="800" height="600" data-fallback>`
-    : '';
-  return `<canvas data-glaze="${glaze}" data-layout="${layout}" data-seed="${seed}" role="img" aria-label="${esc(alt)}のイメージ"></canvas>${img}`;
+  // 写真があれば写真だけを出す（手続き生成のイラストは読み込みに失敗したときの代わり）
+  if (src) return `<img src="${src}" alt="${esc(alt)}" loading="lazy" decoding="async" width="800" height="600" data-fallback data-glaze="${glaze}" data-layout="${layout}" data-seed="${seed}">`;
+  return `<canvas data-glaze="${glaze}" data-layout="${layout}" data-seed="${seed}" role="img" aria-label="${esc(alt)}のイメージ"></canvas>`;
 };
 
 const menuCard = (L, m, i) => `<article class="item rv" id="${m.id}">
@@ -127,33 +128,16 @@ const ticket = (L, s, { heading = 'h3' } = {}) => `<article class="ticket rv" da
   </div>
 </article>`;
 
-// 店舗位置を緯度経度から正しい縮尺で描く地図
+// 店舗の地図は Google マップの埋め込み。住所で検索して表示し、タブで店舗を切り替える
+const embedUrl = (s) => `https://www.google.com/maps?q=${encodeURIComponent(`${s.region}${s.locality}${s.street}`)}&hl=ja&z=16&output=embed`;
 function shopMap() {
-  const W = 400, H = 600;
-  const lat0 = 33.575, lat1 = 33.79, lng0 = 130.36;
-  const ky = H / (lat1 - lat0);
-  const kx = ky * Math.cos((33.68 * Math.PI) / 180);
-  const P = (lat, lng) => [(lng - lng0) * kx, (lat1 - lat) * ky];
-  const kmPx = ky / 110.9;
-  const grid = [];
-  for (let la = 33.6; la < lat1; la += 0.05) { const y = P(la, 0)[1]; grid.push(`<line x1="0" x2="${W}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/><text x="4" y="${(y - 4).toFixed(1)}">${la.toFixed(2)}°N</text>`); }
-  for (let ln = 130.4; ln < 130.53; ln += 0.05) { const x = P(0, ln)[0]; grid.push(`<line y1="0" y2="${H}" x1="${x.toFixed(1)}" x2="${x.toFixed(1)}"/><text x="${(x + 4).toFixed(1)}" y="${H - 6}">${ln.toFixed(2)}°E</text>`); }
-  const pins = shops.map((s) => {
-    const [x, y] = P(s.geo.lat, s.geo.lng);
-    const right = x < W * 0.62;
-    return `<g class="pin" id="pin-${s.slug}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8"/><text x="${(x + (right ? 14 : -14)).toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="${right ? 'start' : 'end'}">${s.name}</text></g>`;
-  }).join('');
-  const [hx, hy] = P(33.5897, 130.4207);
-  const bar = kmPx * 2;
   return `<figure class="map rv" aria-labelledby="map-cap">
-  <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="鶏好4店舗の位置関係（福岡市東区・福津市）">
-    <g class="grid">${grid.join('')}</g>
-    <g class="ref"><circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="4"/><text x="${(hx + 10).toFixed(1)}" y="${(hy + 4).toFixed(1)}">博多駅</text></g>
-    ${pins}
-    <g transform="translate(${W - 24 - bar} ${H - 34})" class="ref"><rect width="${bar.toFixed(1)}" height="4" fill="currentColor" style="fill:var(--kraft-ink)"/><text y="-6">2 km</text></g>
-    <g transform="translate(${W - 30} 30)" class="ref"><path d="M0 -16 L7 6 L0 1 L-7 6 Z" style="fill:var(--kraft-ink)"/><text x="-4" y="22">N</text></g>
-  </svg>
-  <figcaption id="map-cap">緯度・経度から縮尺どおりに配置しています。</figcaption>
+  ${PREVIEW ? '' : `<div class="map__tabs" role="tablist" aria-label="地図に表示する店舗">${shops.map((s, i) => `<button type="button" role="tab" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-map="${esc(embedUrl(s))}">${esc(s.name)}</button>`).join('')}</div>`}
+  ${PREVIEW
+    // Artifact プレビューは外部サイトの埋め込みを読み込めないため、代わりに Google マップへのリンクを出す
+    ? `<div class="map__frame map__frame--preview"><p>プレビューでは Google マップを埋め込めません。<br>公開後のサイトでは、ここに地図が表示されます。</p><p class="map__links">${shops.map((s) => `<a href="${mapUrl(s)}" target="_blank" rel="noopener">${esc(s.name)}の地図を開く</a>`).join('')}</p></div>`
+    : `<iframe class="map__frame" src="${esc(embedUrl(shops[0]))}" title="${esc(shops[0].name)}の地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`}
+  <figcaption id="map-cap">${PREVIEW ? 'Google マップ' : '店舗名を押すと地図が切り替わります（Google マップ）。'}</figcaption>
 </figure>`;
 }
 
@@ -168,6 +152,12 @@ page('/', (L) => {
     description: site.description,
     path: '/',
     L,
+    // トップの大きな「鶏好」は、その2文字を含むフォントだけ先に読み、届くまで文字を出さない（細い代替フォントが一瞬見えるのを防ぐ）
+    preload: [
+      `<link rel="preload" href="${L('assets/fonts/dela-400-2.woff2')}" as="font" type="font/woff2" crossorigin>`,
+      `<link rel="preload" href="${L('assets/fonts/dela-400-4.woff2')}" as="font" type="font/woff2" crossorigin>`,
+      `<style>@font-face{font-family:"Dela Hero";font-display:block;src:url(${L('assets/fonts/dela-400-2.woff2')}) format("woff2");unicode-range:U+597D}@font-face{font-family:"Dela Hero";font-display:block;src:url(${L('assets/fonts/dela-400-4.woff2')}) format("woff2");unicode-range:U+9D8F}</style>`,
+    ],
     jsonld: graph(webpageLD('/', 'からあげ専門店 鶏好', 'WebPage', { primaryImageOfPage: abs(site.ogImage) }), ...shops.map(restaurantLD), menuLD(), {
       '@type': 'FAQPage', '@id': `${site.url}/#faq`, mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
     }),
@@ -178,9 +168,9 @@ page('/', (L) => {
       <p class="hero__kicker"><span class="status" role="status"><i></i>揚げたて準備中</span><span>福岡市東区・福津市に4店舗</span></p>
       <div class="hero__stage">
         <h1 class="hero__name" id="hero-title"><span class="sub">福岡のからあげテイクアウト専門店</span>鶏好<span class="ruby">TORIYOSHI</span></h1>
-        <div class="hero__pile" tabindex="0" role="img" aria-label="揚げたての鶏好のからあげ。タップすると揚げ音が弾けます">
+        <div class="hero__pile" tabindex="0" role="img" aria-label="鶏好のからあげ弁当。からあげ・ご飯・漬物をタップすると、それぞれの音が弾けます">
           <span class="loading" aria-hidden="true">揚げたて準備中…</span>
-          <canvas class="base"></canvas><canvas class="fx"></canvas>
+          <img class="base" src="${L('assets/photos/hero-bento.webp')}" alt="" width="1406" height="888" decoding="async" fetchpriority="high"><canvas class="fx"></canvas>
         </div>
       </div>
       <p class="hero__tate" aria-label="食卓に幸福を、食卓に笑顔を、食卓に愛を">食卓に<span class="flip" data-words='${JSON.stringify(site.taglineWords)}'><span>${site.taglineWords[0]}</span></span>を</p>
@@ -189,7 +179,7 @@ page('/', (L) => {
         <div class="hero__cta"><a class="btn" href="#shops">${ICON.tel}電話で予約する</a><a class="btn btn--ghost" href="#menu">メニューを見る</a></div>
       </div>
     </div>
-    <p class="hero__hint" aria-hidden="true">TAP THE KARAAGE ↓</p>
+    <p class="hero__hint" aria-hidden="true">TAP THE BENTO →</p>
   </section>
 
   <div class="marquee" role="presentation"><div class="marquee__track">${mq}${mq}</div></div>
@@ -211,9 +201,9 @@ page('/', (L) => {
     <div class="wrap">
       <div class="sec__head rv"><p class="eyebrow">Flavor Lab</p><h2 class="h2" id="f-title">もも、7つの味。</h2><p class="lead">看板の骨なしもも肉は、7種類の味から選べます。気になる味を押してみてください。</p></div>
       <div class="lab__grid">
-        <div class="lab__stage rv"><span class="lab__count mono">01 / 07</span><canvas role="img" aria-label="選んだ味のからあげのイメージ"></canvas><span class="lab__big" aria-hidden="true">${flavors[0].name}</span></div>
+        <div class="lab__stage rv" style="--tone:${flavors[0].tone};--len:${[...flavors[0].name].length}" data-spice="${flavors[0].spice}"><span class="lab__count mono">01 / 07</span><canvas class="lab__fx" aria-hidden="true"></canvas><div class="lab__plate" aria-live="polite"><p class="lab__formula">${formula(flavors[0])}</p><p class="lab__big">${esc(flavors[0].name)}</p><p class="lab__kana mono">${esc(flavors[0].kana)}</p></div></div>
         <div>
-          <ul class="flist" role="tablist" aria-label="もも肉の味" aria-orientation="vertical">${flavors.map((f, i) => `<li role="presentation"><button role="tab" type="button" id="tab-${f.id}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-glaze="${f.glaze}" data-name="${esc(f.name)}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="nm">${esc(f.name)}</span>${f.badge ? `<span class="bd">${f.badge}</span>` : '<span></span>'}<span class="cp">${esc(f.copy)}</span></button></li>`).join('')}</ul>
+          <ul class="flist" role="tablist" aria-label="もも肉の味" aria-orientation="vertical">${flavors.map((f, i) => `<li role="presentation"><button role="tab" type="button" id="tab-${f.id}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-name="${esc(f.name)}" data-kana="${esc(f.kana)}" data-tone="${f.tone}" data-spice="${f.spice}" data-formula="${esc(formula(f))}"><span class="n">${String(i + 1).padStart(2, '0')}</span><span class="nm">${esc(f.name)}</span>${f.badge ? `<span class="bd">${f.badge}</span>` : '<span></span>'}<span class="cp">${esc(f.copy)}</span></button></li>`).join('')}</ul>
           <p class="lab__note">骨なしもも肉 6〜7個（250g以上）。オリジナルの塩は別売りです。</p>
         </div>
       </div>
@@ -235,7 +225,7 @@ page('/', (L) => {
       <div class="order rv">
         <div>${ICON.phone}<h3>電話で予約</h3><p>お近くの店舗にお電話ください。受け取り時間に合わせて揚げたてをご用意します。盛り合わせはご予約制です。</p></div>
         <div>${ICON.bag}<h3>店頭で</h3><p>お店で直接ご注文いただけます。揚げ上がりまで少しお待ちいただく場合があります。</p></div>
-        <div>${ICON.bike}<h3>宅配で</h3><p>吉塚店は Uber Eats・Wolt・出前館、福津店は Uber Eats でお届けします。</p></div>
+        <div>${ICON.bike}<h3>宅配で</h3><p>吉塚店は Uber Eats・出前館、福津店は Uber Eats でお届けします。</p></div>
       </div>
     </div>
   </section>
@@ -275,7 +265,7 @@ ${pageHero({ L, title: 'メニュー', lead: '特製の漬けダレで長時間�
 <section class="sec"><div class="wrap stack">
   <div>
     <div class="sec__head"><p class="eyebrow">骨なしもも肉の味</p><h2 class="h2">7種類から選べます</h2></div>
-    <ul class="ftiles">${flavors.map((f, i) => `<li class="ftile"><canvas data-glaze="${f.glaze}" data-layout="trio" data-seed="${i + 2}" role="img" aria-label="${esc(f.name)}のからあげのイメージ"></canvas><div><h3>${esc(f.name)}${f.badge ? `<small>${f.badge}</small>` : ''}</h3><p>${esc(f.copy)}</p></div></li>`).join('')}</ul>
+    <ul class="ftiles">${flavors.map((f, i) => `<li class="ftile" style="--tone:${f.tone}"><p class="ftile__vis" data-spice="${f.spice}" aria-hidden="true"><span class="no mono">${String(i + 1).padStart(2, '0')}</span></p><div><p class="ftile__formula">${formula(f)}</p><h3>${esc(f.name)}${f.badge ? `<small>${f.badge}</small>` : ''}</h3><p>${esc(f.copy)}</p></div></li>`).join('')}</ul>
   </div>
   <div class="menu-grid">${menu.map((m, i) => menuCard(L, m, i)).join('')}</div>
   <ul class="notes">${menuNotes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
@@ -302,7 +292,7 @@ ${pageHero({ L, title: 'アレルギー表示', crumbs: [['menu/', 'メニュー
 /* ---------- 店舗一覧・詳細 ---------- */
 page('shop/', (L) => head({
   title: '店舗一覧｜からあげ専門店 鶏好（福岡市東区・福津市）',
-  description: '鶏好の店舗一覧。美和台本店・吉塚店・舞松原店（福岡市東区）、福津店（福津市）。電話予約・Uber Eats・Wolt・出前館の宅配にも対応。',
+  description: '鶏好の店舗一覧。美和台本店・吉塚店・舞松原店（福岡市東区）、福津店（福津市）。電話予約・Uber Eats・出前館の宅配にも対応。',
   path: 'shop/', L,
   jsonld: graph(webpageLD('shop/', '店舗一覧', 'CollectionPage'), ...shops.map(restaurantLD), crumbLD([['shop/', '店舗一覧']])),
 }) + header({ L, current: 'shop/' }) + `
@@ -586,13 +576,13 @@ Sitemap: ${site.url}/sitemap.xml
 const shopMd = (s) => `- **${s.name}**：${addressOf(s)}／電話 ${s.tel}／${s.delivery.length ? `宅配：${s.delivery.map((d) => `[${d.name}](${d.url})`).join('、')}` : 'テイクアウト・電話予約'}／[店舗ページ](${abs(`shop/${s.slug}/`)})`;
 const llms = `# からあげ専門店 鶏好（とりよし / Toriyoshi）
 
-> 福岡のからあげテイクアウト専門店。特製の漬けダレで長時間熟成させた骨なしもも肉のからあげを、7種類の味で提供しています。電話予約・宅配（Uber Eats・Wolt・出前館、一部店舗）に対応。福岡市東区に3店舗、福津市に1店舗。運営：${company.name}。
+> 福岡のからあげテイクアウト専門店。特製の漬けダレで長時間熟成させた骨なしもも肉のからあげを、7種類の味で提供しています。電話予約・宅配（Uber Eats・出前館、一部店舗）に対応。福岡市東区に3店舗、福津市に1店舗。運営：${company.name}。
 
 キャッチコピー：「${site.tagline}」「食卓に幸福を・食卓に笑顔を・食卓に愛を」
 
 ## 基本情報
 - 業態：お持ち帰り（テイクアウト）専門のからあげ店。店内飲食はありません。
-- 注文方法：店頭、各店舗への電話予約、宅配アプリ（吉塚店：Uber Eats・Wolt・出前館／福津店：Uber Eats）
+- 注文方法：店頭、各店舗への電話予約、宅配アプリ（吉塚店：Uber Eats・出前館／福津店：Uber Eats）
 - 看板商品：骨なしもも肉 6〜7個（250g以上）。味は たれ（一番人気）・たれコショー・たれ一味・たれにんにく・韓辛にんにく・塩・ポン酢 の7種類
 - そのほか：むね肉、手羽先（塩・名古屋風）、身付き軟骨、串（砂ずり・素揚げ砂ずり・ぼんじり・はつ・手羽先）、からあげ弁当（小盛・大盛・特盛）、からあげ盛り合わせ（3人前・5人前、要予約）
 - 価格・営業時間・定休日：各店舗へお電話でご確認ください（サイト上では未掲載）
@@ -661,7 +651,19 @@ await writeFile(join(OUT, 'llms-full.txt'), llmsFull);
 
 await writeFile(join(OUT, 'manifest.webmanifest'), JSON.stringify({
   name: 'からあげ専門店 鶏好', short_name: '鶏好', lang: 'ja', start_url: '/', display: 'standalone', background_color: '#FFFBF2', theme_color: site.themeColor,
-  icons: [{ src: '/assets/img/favicon.svg', sizes: 'any', type: 'image/svg+xml' }, { src: '/assets/img/icon-512.png', sizes: '512x512', type: 'image/png' }],
+  icons: [{ src: '/assets/img/favicon.png', sizes: '64x64', type: 'image/png' }, { src: '/assets/img/icon-512.png', sizes: '512x512', type: 'image/png' }],
 }, null, 2));
 
 console.log(`built ${pages.length} pages → ${OUT}/`);
+
+// 確認用の仮公開（GitHub Pages など）向け: 全ページを検索結果に出さない
+if (process.argv.includes('--staging')) {
+  const walk = async (d) => (await readdir(d, { withFileTypes: true })).flatMap((e) => (e.isDirectory() ? [] : [join(d, e.name)])).concat(...await Promise.all((await readdir(d, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => walk(join(d, e.name)))));
+  for (const f of (await walk(OUT)).filter((f) => f.endsWith('.html'))) {
+    const html = await readFile(f, 'utf8');
+    await writeFile(f, html.replace(/<meta name="robots" content="[^"]*">/, '<meta name="robots" content="noindex, nofollow">'));
+  }
+  await writeFile(join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
+  await writeFile(join(OUT, '.nojekyll'), '');
+  console.log('staging: 全ページ noindex');
+}

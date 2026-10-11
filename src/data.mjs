@@ -16,7 +16,7 @@ export const site = {
   taglineWords: ['幸福', '笑顔', '愛'],
   since: 2020,
   ogImage: '/assets/img/og.png',
-  themeColor: '#F2A900',
+  themeColor: '#4C1A2C',
   emails: {
     general: 'info@toriyoshi.love',
     recruit: 'info@toriyoshi.love',
@@ -59,7 +59,7 @@ export const shops = [
     hours: null,
     closed: null,
     delivery: [],
-    photo: 'shop-miwadai.jpg',
+    photo: 'shop-miwadai.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/4ce62eed8967055a3102964b62ce54aa.jpg',
   },
   {
@@ -76,11 +76,11 @@ export const shops = [
     closed: null,
     note: '2025年12月に移転しました。新しい住所は上記のとおりです。',
     delivery: [
-      { name: 'Uber Eats', url: 'https://www.ubereats.com/jp/fukuoka/food-delivery/%E3%81%8B%E3%82%89%E3%81%82%E3%81%91%E9%B7%84%E5%A5%BD-fried-chicken-toriyoshi/mJOuT7OLQYmHB9-5517nCg' },
-      { name: 'Wolt', url: 'https://wolt.com/ja/jpn/fukuoka/restaurant/karaage-toriyoshi-yoshizuka' },
+      // 旧URLは移転（2025-12）でリンク切れ。正しい店舗URLが分かるまで Uber Eats の「鶏好」検索に飛ばす
+      { name: 'Uber Eats', url: 'https://www.ubereats.com/jp/search?q=%E9%B6%8F%E5%A5%BD' },
       { name: '出前館', url: 'https://demae-can.com/shop/menu/3094573' },
     ],
-    photo: 'shop-yoshizuka.jpg',
+    photo: 'shop-yoshizuka.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2026/10/yoshizuka-shop-2026.jpg',
   },
   {
@@ -96,7 +96,7 @@ export const shops = [
     hours: null,
     closed: null,
     delivery: [],
-    photo: 'shop-maimatsubara.jpg',
+    photo: 'shop-maimatsubara.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/8cc2d3943d390f1f30b67d3f464886b1.jpg',
   },
   {
@@ -112,7 +112,7 @@ export const shops = [
     hours: null,
     closed: null,
     delivery: [{ name: 'Uber Eats', url: 'https://ubereats.app.link/AsmQn87Cqtb' }],
-    photo: 'shop-fukutsu.jpg',
+    photo: 'shop-fukutsu.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/1530f2f07792d7b3c16e4c89b5c86566.jpg',
   },
 ];
@@ -123,7 +123,7 @@ export const telIntl = (tel) => `+81-${tel.replace(/^0/, '')}`;
 export const mapUrl = (s) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`からあげ鶏好 ${s.name} ${s.region}${s.locality}${s.street}`)}`;
 
-// 骨なしもも肉の7つの味。glaze は karaage.js の描画パラメータ。
+// 骨なしもも肉の7つの味（写真なし）。parts は味の組み立て、tone はラボの色、spice は降らせる薬味（main.js）。
 export const flavors = [
   {
     id: 'tare',
@@ -132,8 +132,9 @@ export const flavors = [
     badge: '一番人気',
     copy: '特製の漬けダレがじっくり染みた、鶏好の看板の味。まずはここから。',
     glaze: 'tare',
-    photo: 'momo-tare.jpg',
-    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/508f8d8807dcc1cca093d4f75398f49c.jpeg',
+    parts: ['特製だれ'],
+    tone: '#E0892A',
+    spice: 'tare',
   },
   {
     id: 'tare-pepper',
@@ -141,6 +142,9 @@ export const flavors = [
     kana: 'たれこしょー',
     copy: 'たれの甘みに、コショーの香りをきりっと重ねて。',
     glaze: 'pepper',
+    parts: ['特製だれ', 'コショー'],
+    tone: '#C9822E',
+    spice: 'pepper',
   },
   {
     id: 'tare-ichimi',
@@ -148,6 +152,9 @@ export const flavors = [
     kana: 'たれいちみ',
     copy: 'たれに一味唐辛子をひとふり。あとから辛さが追いかけてくる。',
     glaze: 'ichimi',
+    parts: ['特製だれ', '一味唐辛子'],
+    tone: '#E2501E',
+    spice: 'ichimi',
   },
   {
     id: 'tare-garlic',
@@ -155,8 +162,9 @@ export const flavors = [
     kana: 'たれにんにく',
     copy: '甘めのたれとにんにくの組み合わせ。ごはんが止まらない味。',
     glaze: 'garlic',
-    photo: 'momo-tare-garlic.jpg',
-    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/56e4492280c81dd5fb66e2834c5a6411.jpeg',
+    parts: ['特製だれ', 'にんにく'],
+    tone: '#E3A33A',
+    spice: 'garlic',
   },
   {
     id: 'kara-garlic',
@@ -164,8 +172,9 @@ export const flavors = [
     kana: 'からにんにく',
     copy: '韓国唐辛子とにんにくで仕上げた、真っ赤な一皿。',
     glaze: 'kankara',
-    photo: 'momo-kankara.jpg',
-    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/bf5e9810ca0bb2180d738c535094b0d9.jpeg',
+    parts: ['韓国唐辛子', 'にんにく'],
+    tone: '#D8321A',
+    spice: 'kankara',
   },
   {
     id: 'shio',
@@ -173,8 +182,9 @@ export const flavors = [
     kana: 'しお',
     copy: '特製の漬けダレに漬け込んだもも肉を、素直に揚げて。オリジナルの塩を添えるとさらにおいしい。',
     glaze: 'shio',
-    photo: 'momo-shio.jpg',
-    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/cf4e58b0c0353aef5a0a66721df55b2b.jpeg',
+    parts: ['漬けダレ', 'オリジナルの塩'],
+    tone: '#F2DDB0',
+    spice: 'shio',
   },
   {
     id: 'ponzu',
@@ -182,8 +192,9 @@ export const flavors = [
     kana: 'ぽんず',
     copy: 'オリジナルのポン酢でさっぱりと。そのままでおいしく食べられます。',
     glaze: 'ponzu',
-    photo: 'momo-ponzu.jpg',
-    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/75bb79c5d93592fb734b7eac5dbca5f0.jpeg',
+    parts: ['オリジナルのポン酢'],
+    tone: '#F2B632',
+    spice: 'ponzu',
   },
 ];
 
@@ -198,6 +209,8 @@ export const menu = [
     options: flavors.map((f) => f.name),
     price: null,
     glaze: 'tare',
+    photo: 'momo-tare.webp',
+    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/508f8d8807dcc1cca093d4f75398f49c.jpeg',
   },
   {
     id: 'mune',
@@ -206,7 +219,7 @@ export const menu = [
     desc: 'やわらかくて食べごたえのある、むね肉のからあげ。',
     price: null,
     glaze: 'mune',
-    photo: 'mune.jpg',
+    photo: 'mune.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/dd84f452bb1c7555621739c163d07cf2.jpeg',
   },
   {
@@ -217,7 +230,7 @@ export const menu = [
     options: ['塩', '名古屋風'],
     price: null,
     glaze: 'tebasaki',
-    photo: 'tebasaki-shio.jpg',
+    photo: 'tebasaki-shio.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/617e212759e18d88dba1a0d21a37629f.jpeg',
   },
   {
@@ -227,7 +240,7 @@ export const menu = [
     desc: '身が付いたままの軟骨。コリッとした歯ざわりとうま味を両方楽しめます。',
     price: null,
     glaze: 'nankotsu',
-    photo: 'nankotsu.jpg',
+    photo: 'nankotsu.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/a137efb24c8b1d30d87241c86afa2443.jpeg',
   },
   {
@@ -239,6 +252,8 @@ export const menu = [
     options: ['砂ずり', '素揚げ砂ずり', 'ぼんじり', 'はつ', '手羽先'],
     price: null,
     glaze: 'kushi',
+    // 旧サイト /menu/ の3枚組バナー（ebd145da…jpg）から串の部分を切り出したもの
+    photo: 'kushi.webp',
   },
   {
     id: 'bento',
@@ -249,6 +264,8 @@ export const menu = [
     options: ['小盛', '大盛', '特盛'],
     price: null,
     glaze: 'tare',
+    photo: 'bento.webp',
+    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/c10237a4fb3077a1bf4c485e5e67462c.jpg',
   },
   {
     id: 'moriawase-3',
@@ -259,7 +276,7 @@ export const menu = [
     price: null,
     reservation: true,
     glaze: 'tare',
-    photo: 'moriawase.jpg',
+    photo: 'moriawase.webp',
     legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/27e88bbd088f29e625b1d46117849249.jpeg',
   },
   {
@@ -271,6 +288,8 @@ export const menu = [
     price: null,
     reservation: true,
     glaze: 'tare',
+    photo: 'moriawase-5.webp',
+    legacyPhoto: 'https://toriyoshi.love/wp-content/uploads/2020/10/top-e1603346842728.jpg',
   },
 ];
 
@@ -346,7 +365,7 @@ export const faqs = [
   },
   {
     q: '宅配（デリバリー）はできますか？',
-    a: '吉塚店は Uber Eats・Wolt・出前館、福津店は Uber Eats で宅配に対応しています。美和台本店と舞松原店はテイクアウト（店頭・電話予約）のみです。',
+    a: '吉塚店は Uber Eats・出前館、福津店は Uber Eats で宅配に対応しています。美和台本店と舞松原店はテイクアウト（店頭・電話予約）のみです。',
   },
   {
     q: 'どこにお店がありますか？',
