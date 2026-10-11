@@ -1,0 +1,30 @@
+# からあげ専門店 鶏好（とりよし / Toriyoshi）
+
+> 福岡のからあげテイクアウト専門店。特製の漬けダレで長時間熟成させた骨なしもも肉のからあげを、7種類の味で提供しています。電話予約・宅配（Uber Eats・Wolt・出前館、一部店舗）に対応。福岡市東区に3店舗、福津市に1店舗。運営：株式会社 free idea.。
+
+キャッチコピー：「幸福 × 笑顔 × 愛 = 鶏好のからあげ」「食卓に幸福を・食卓に笑顔を・食卓に愛を」
+
+## 基本情報
+- 業態：お持ち帰り（テイクアウト）専門のからあげ店。店内飲食はありません。
+- 注文方法：店頭、各店舗への電話予約、宅配アプリ（吉塚店：Uber Eats・Wolt・出前館／福津店：Uber Eats）
+- 看板商品：骨なしもも肉 6〜7個（250g以上）。味は たれ（一番人気）・たれコショー・たれ一味・たれにんにく・韓辛にんにく・塩・ポン酢 の7種類
+- そのほか：むね肉、手羽先（塩・名古屋風）、身付き軟骨、串（砂ずり・素揚げ砂ずり・ぼんじり・はつ・手羽先）、からあげ弁当（小盛・大盛・特盛）、からあげ盛り合わせ（3人前・5人前、要予約）
+- 価格・営業時間・定休日：各店舗へお電話でご確認ください（サイト上では未掲載）
+
+## 店舗
+- **美和台本店**：〒811-0212 福岡県福岡市東区美和台3丁目4-7／電話 092-607-5803／テイクアウト・電話予約／[店舗ページ](https://toriyoshi.love/shop/miwadai/)
+- **吉塚店**：〒812-0054 福岡県福岡市東区馬出2丁目2-2／電話 092-641-1044／宅配：[Uber Eats](https://www.ubereats.com/jp/fukuoka/food-delivery/%E3%81%8B%E3%82%89%E3%81%82%E3%81%91%E9%B7%84%E5%A5%BD-fried-chicken-toriyoshi/mJOuT7OLQYmHB9-5517nCg)、[Wolt](https://wolt.com/ja/jpn/fukuoka/restaurant/karaage-toriyoshi-yoshizuka)、[出前館](https://demae-can.com/shop/menu/3094573)／[店舗ページ](https://toriyoshi.love/shop/yoshizuka/)
+- **舞松原店**：〒813-0042 福岡県福岡市東区舞松原2丁目6-14／電話 092-681-6689／テイクアウト・電話予約／[店舗ページ](https://toriyoshi.love/shop/maimatsubara/)
+- **福津店**：〒811-3218 福岡県福津市手光南1丁目6-10 山田ビル1階／電話 0940-42-1034／宅配：[Uber Eats](https://ubereats.app.link/AsmQn87Cqtb)／[店舗ページ](https://toriyoshi.love/shop/fukutsu/)
+
+## 主なページ
+- [メニュー](https://toriyoshi.love/menu/)：全メニューと7種類の味
+- [店舗一覧](https://toriyoshi.love/shop/)：住所・電話番号・宅配
+- [お知らせ](https://toriyoshi.love/news/)：移転・開店・閉店情報
+- [採用情報](https://toriyoshi.love/recruit/)：正社員（店長候補）募集
+- [フランチャイズ情報](https://toriyoshi.love/franchise/)：加盟の流れ
+- [会社概要](https://toriyoshi.love/corporation/)
+
+## Optional
+- [全文（llms-full.txt）](https://toriyoshi.love/llms-full.txt)
+- [よくあるご質問](https://toriyoshi.love/#faq)
