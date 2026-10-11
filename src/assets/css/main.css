@@ -119,7 +119,7 @@ p { margin: 0; text-wrap: pretty; }
 .status i { width: 8px; height: 8px; border-radius: 50%; background: #FF6A2B; box-shadow: 0 0 0 0 rgba(255, 106, 43, .7); animation: pulse 1.8s infinite; }
 @keyframes pulse { 70% { box-shadow: 0 0 0 9px rgba(255, 106, 43, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 106, 43, 0); } }
 .hero__stage { position: relative; grid-column: 1; min-height: clamp(360px, 52vw, 640px); }
-.hero__name { position: absolute; inset: 0 auto auto 0; font-family: var(--f-display); font-size: clamp(9rem, 33vw, 27rem); line-height: 0.86; letter-spacing: -0.02em; margin: 0; color: #1C0F08; user-select: none; }
+.hero__name { position: absolute; inset: 0 auto auto 0; font-family: "Dela Hero", var(--f-display); font-size: clamp(9rem, 33vw, 27rem); line-height: 0.86; letter-spacing: -0.02em; margin: 0; color: #1C0F08; user-select: none; }
 .hero__name .sub { display: block; font-family: var(--f-body); font-weight: 900; font-size: clamp(0.85rem, 0.6rem + 0.9vw, 1.2rem); letter-spacing: 0.3em; line-height: 1.4; margin-bottom: 0.6em; }
 .hero__name .ruby { display: block; font-family: var(--f-mono); font-size: clamp(0.65rem, 0.55rem + 0.3vw, 0.8rem); letter-spacing: 0.5em; margin-top: 1.2em; font-weight: 400; }
 .hero__pile { position: absolute; right: -3%; bottom: 0; width: min(48%, 540px); aspect-ratio: 1080 / 1178; cursor: pointer; -webkit-tap-highlight-color: transparent; }

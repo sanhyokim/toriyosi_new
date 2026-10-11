@@ -152,6 +152,12 @@ page('/', (L) => {
     description: site.description,
     path: '/',
     L,
+    // トップの大きな「鶏好」は、その2文字を含むフォントだけ先に読み、届くまで文字を出さない（細い代替フォントが一瞬見えるのを防ぐ）
+    preload: [
+      `<link rel="preload" href="${L('assets/fonts/dela-400-2.woff2')}" as="font" type="font/woff2" crossorigin>`,
+      `<link rel="preload" href="${L('assets/fonts/dela-400-4.woff2')}" as="font" type="font/woff2" crossorigin>`,
+      `<style>@font-face{font-family:"Dela Hero";font-display:block;src:url(${L('assets/fonts/dela-400-2.woff2')}) format("woff2");unicode-range:U+597D}@font-face{font-family:"Dela Hero";font-display:block;src:url(${L('assets/fonts/dela-400-4.woff2')}) format("woff2");unicode-range:U+9D8F}</style>`,
+    ],
     jsonld: graph(webpageLD('/', 'からあげ専門店 鶏好', 'WebPage', { primaryImageOfPage: abs(site.ogImage) }), ...shops.map(restaurantLD), menuLD(), {
       '@type': 'FAQPage', '@id': `${site.url}/#faq`, mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
     }),
