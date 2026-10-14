@@ -1,6 +1,10 @@
 # からあげ専門店 鶏好 — toriyoshi.love リニューアル
 
-福岡のからあげテイクアウト専門店「鶏好（とりよし）」の公式サイトを、WordPress から依存なしの静的サイトへ作り直したものです。
+福岡のからあげテイクアウト専門店「鶏好（とりよし）」の公式サイトを、WordPress から依存なしの静的サイトへ作り直したものです。2026-10-11 から https://toriyoshi.love/ で公開中です。
+
+- 経緯・決定事項・本番サーバーの状態・未確定事項: [docs/HANDOFF.md](docs/HANDOFF.md)
+- 本番サーバー（さくらのレンタルサーバ）の更新・巻き戻し手順: [docs/DEPLOY-sakura.md](docs/DEPLOY-sakura.md)
+- AI エージェント向けの要点: [CLAUDE.md](CLAUDE.md)
 
 ## 使い方
 
@@ -12,7 +16,7 @@ npm run fonts      # 文言を変えたあとに実行（フォントのサブ�
 npm run images     # OGP画像・アイコンを再生成（Playwright が必要）
 ```
 
-`dist/` をそのまま今のサーバー（Apache）に置けば公開できます。手順は [DEPLOY.md](DEPLOY.md) を参照してください。`.htaccess`（HTTPS統一・圧縮・キャッシュ・旧URLのリダイレクト）も `dist/` に含まれます。
+`dist/` の中身を本番サーバー（Apache）の公開フォルダに置けば公開できます。手順は [docs/DEPLOY-sakura.md](docs/DEPLOY-sakura.md) を参照してください。`.htaccess`（HTTPS統一・圧縮・キャッシュ・旧URLのリダイレクト）も `dist/` に含まれます。
 
 ## 構成
 
@@ -36,13 +40,7 @@ npm run images     # OGP画像・アイコンを再生成（Playwright が必要
 
 ## 写真について
 
-旧サイトの写真は今回の作業環境から取得できなかったため、各メニュー・店舗のビジュアルは `karaage.js` で描画しています。写真を使う場合は次のどちらかで `src/assets/photos/` に置けば、ビルド時に自動で写真に切り替わります。
-
-```bash
-node scripts/fetch-legacy-photos.mjs   # 旧サイトの写真を取得
-```
-
-ファイル名は `src/data.mjs` の `photo` を参照してください。
+メニュー・店舗・トップの写真は `src/assets/photos/` に WebP で同梱しています（旧サイトから取り込んだもの＋お店支給のからあげ弁当）。`src/data.mjs` の `photo` と同じ名前のファイルがあれば写真、無ければ `karaage.js` の描画が使われます。「もも、7つの味」は写真を使わない演出です。
 
 ## 未確定の情報（要確認）
 
@@ -53,3 +51,5 @@ node scripts/fetch-legacy-photos.mjs   # 旧サイトの写真を取得
 - アレルギー表示の内容（旧サイトでは動画のみ）
 - お問い合わせフォームの送信先（`contact` ページの `data-endpoint`。未設定の場合はメールアプリで下書きを開きます）
 - 採用の応募先（旧サイトの郵送先が閉店済みの井尻駅前店だったため、メールのみ掲載）
+
+最新の状況は [docs/HANDOFF.md](docs/HANDOFF.md) の「未確定・オーナー確認待ち」を見てください。
