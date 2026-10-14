@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Martian+Mono:wght@400&family=Zen+Kaku+Gothic+New:wght@900&display=swap">
+<style>
+  html,body,p{margin:0}
+  body{width:1200px;height:630px;background:#F2A900;color:#1C0F08;position:relative;overflow:hidden;font-family:"Zen Kaku Gothic New",sans-serif}
+  .name{position:absolute;left:56px;top:120px;font-family:"Dela Gothic One";font-size:330px;line-height:.9;letter-spacing:-.02em}
+  .sub{position:absolute;left:70px;top:70px;font-weight:900;font-size:26px;letter-spacing:.3em}
+  canvas{position:absolute;right:-30px;bottom:-20px;width:640px;height:550px}
+  .eq{position:absolute;left:70px;bottom:46px;font-family:"Martian Mono";font-size:22px;display:flex;gap:14px;align-items:baseline}
+  .eq b{font-family:"Dela Gothic One";font-weight:400;font-size:34px}
+  .line{position:absolute;left:70px;right:70px;bottom:104px;border-top:3px solid #1C0F08}
+  body.icon{width:100vw;height:100vh}
+  body.icon canvas{left:2%;top:4%;width:96%;height:96%;right:auto;bottom:auto}
+</style>
+<body>
+<p class="sub">福岡のからあげテイクアウト専門店</p>
+<p class="name">鶏好</p>
+<div class="line"></div>
+<p class="eq"><b>幸福</b>×<b>笑顔</b>×<b>愛</b>=<span>鶏好のからあげ</span></p>
+<canvas id="c"></canvas>
+<script type="module">
+import { renderPile } from '../src/assets/js/karaage.js';
+const icon = location.hash === '#icon';
+if (icon) { document.body.className = 'icon'; document.querySelectorAll('p,.line').forEach(e => e.remove()); }
+await document.fonts.ready;
+await renderPile(document.getElementById('c'), { glaze: 'tare', layout: icon ? 'trio' : 'hero', seed: 3, dpr: 2, maxRes: 2 });
+document.body.dataset.ready = '1';
+</script>
+</body></html>
