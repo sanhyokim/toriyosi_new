@@ -115,6 +115,7 @@ p { margin: 0; text-wrap: pretty; }
 .drawer__tels { display: grid; gap: 8px; border-top: 1px solid var(--en-line); padding-top: 20px; }
 .drawer__tels a { display: flex; justify-content: space-between; text-decoration: none; font-weight: 700; gap: 12px; }
 .telsheet { width: min(440px, calc(100% - 32px)); padding: 28px 24px 20px; border: 0; border-radius: 20px; background: var(--en); color: var(--en-ink); box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+.telsheet:focus { outline: none; }
 .telsheet::backdrop { background: rgba(20,8,12,.55); }
 .telsheet[open] { animation: telsheet-in .28s var(--ease); }
 @keyframes telsheet-in { from { opacity: 0; transform: translateY(16px); } }

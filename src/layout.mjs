@@ -101,7 +101,7 @@ export function header({ L, current = '', onGold = true }) {
   <nav aria-label="モバイルメニュー"><ul>${drawerItems}</ul></nav>
   <div class="drawer__tels"><p class="eyebrow" style="color:inherit">電話でご予約</p>${tels}</div>
 </div>
-<dialog class="telsheet" id="telsheet" aria-labelledby="telsheet-title">
+<dialog class="telsheet" id="telsheet" aria-labelledby="telsheet-title" tabindex="-1">
   <p class="telsheet__title" id="telsheet-title">どの店舗に電話しますか？</p>
   <ul class="telsheet__list">${shops.map((s) => `<li><a href="${telHref(s.tel)}">${ICON.tel}<span class="telsheet__name">${esc(s.name)}</span><span class="mono">${s.tel}</span></a></li>`).join('')}</ul>
   <form method="dialog"><button class="btn btn--ghost telsheet__close" type="submit">閉じる</button></form>

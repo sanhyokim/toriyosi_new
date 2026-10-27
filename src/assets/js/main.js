@@ -39,6 +39,8 @@ if (telsheet && typeof telsheet.showModal === 'function') {
     e.preventDefault();
     if (drawer && !drawer.hidden) $('.close', drawer)?.click();
     telsheet.showModal();
+    // 開いた直後に1店舗目へフォーカス枠が出ないよう、シート自体にフォーカスを置く
+    telsheet.focus();
   });
   telsheet.addEventListener('click', (e) => { if (e.target === telsheet) telsheet.close(); });
 }
