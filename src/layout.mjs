@@ -91,7 +91,7 @@ export function header({ L, current = '', onGold = true }) {
     <a class="logo" href="${L('/')}">${MARK(L)}<span class="logo__txt"><span class="logo__name">鶏好</span><span class="logo__sub">からあげ専門店</span></span><span class="sr-only">（ホーム）</span></a>
     <nav class="nav" aria-label="メインメニュー">
       <ul class="nav__list">${items}</ul>
-      <a class="btn nav__tel" href="${L('shop/')}">${ICON.tel}電話で注文</a>
+      <a class="btn nav__tel" href="${L('shop/')}" data-telsheet>${ICON.tel}電話で注文</a>
       <button class="burger" type="button" aria-expanded="false" aria-controls="drawer" aria-label="メニューを開く"><span></span></button>
     </nav>
   </div>
@@ -100,7 +100,12 @@ export function header({ L, current = '', onGold = true }) {
   <button class="burger close" type="button" aria-expanded="true" aria-label="メニューを閉じる"><span></span></button>
   <nav aria-label="モバイルメニュー"><ul>${drawerItems}</ul></nav>
   <div class="drawer__tels"><p class="eyebrow" style="color:inherit">電話でご予約</p>${tels}</div>
-</div>`;
+</div>
+<dialog class="telsheet" id="telsheet" aria-labelledby="telsheet-title">
+  <p class="telsheet__title" id="telsheet-title">どの店舗に電話しますか？</p>
+  <ul class="telsheet__list">${shops.map((s) => `<li><a href="${telHref(s.tel)}">${ICON.tel}<span class="telsheet__name">${esc(s.name)}</span><span class="mono">${s.tel}</span></a></li>`).join('')}</ul>
+  <form method="dialog"><button class="btn btn--ghost telsheet__close" type="submit">閉じる</button></form>
+</dialog>`;
 }
 
 export function footer({ L }) {

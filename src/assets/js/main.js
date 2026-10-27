@@ -30,6 +30,19 @@ if (burger && drawer) {
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && !drawer.hidden) { set(false); burger.focus(); } });
 }
 
+/* 「電話で予約」: 店舗の電話番号を選ぶシートを開く（JS が無いときはリンク先の店舗一覧へ） */
+const telsheet = $('#telsheet');
+if (telsheet && typeof telsheet.showModal === 'function') {
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('[data-telsheet]');
+    if (!a) return;
+    e.preventDefault();
+    if (drawer && !drawer.hidden) $('.close', drawer)?.click();
+    telsheet.showModal();
+  });
+  telsheet.addEventListener('click', (e) => { if (e.target === telsheet) telsheet.close(); });
+}
+
 /* 味ごとの薬味。上から降って、皿（中央）のあたりで消える */
 const SPICES = {
   tare: { n: 26, kinds: [['drop', '#E8A04A'], ['drop', '#B65E10']], size: [3, 6], speed: [0.35, 0.7] },
