@@ -176,7 +176,7 @@ page('/', (L) => {
       <p class="hero__tate" aria-label="食卓に幸福を、食卓に笑顔を、食卓に愛を">食卓に<span class="flip" data-words='${JSON.stringify(site.taglineWords)}'><span>${site.taglineWords[0]}</span></span>を</p>
       <div class="hero__foot">
         <p class="equation"><b>幸福</b><span class="op">×</span><b>笑顔</b><span class="op">×</span><b>愛</b><span class="op">=</span><span>鶏好のからあげ</span></p>
-        <div class="hero__cta"><a class="btn" href="#shops">${ICON.tel}電話で予約する</a><a class="btn btn--ghost" href="#menu">メニューを見る</a></div>
+        <div class="hero__cta"><a class="btn" href="#shops" data-telsheet>${ICON.tel}電話で予約する</a><a class="btn btn--ghost" href="#menu">メニューを見る</a></div>
       </div>
     </div>
     <p class="hero__hint" aria-hidden="true">TAP THE BENTO →</p>
